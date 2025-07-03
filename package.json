@@ -1,0 +1,21 @@
+{
+  "name": "jikan-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "bin": {
+    "jikan-cli": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/node": "^24.0.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
