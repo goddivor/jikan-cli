@@ -1,4 +1,3 @@
-````markdown
 # 📺 jikan-cli
 
 > Une application CLI simple et rapide pour rechercher des animés depuis l'API [Jikan](https://jikan.moe), écrite en TypeScript.
