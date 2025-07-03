@@ -15,6 +15,7 @@
   "description": "",
   "dependencies": {
     "@types/node": "^24.0.10",
+    "chalk": "^4.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
