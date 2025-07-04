@@ -19,6 +19,8 @@ async function main(): Promise<void> {
       process.exit(1);
     }
     await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName);
+  } else if (parsedArgs.showRandom) {
+    await AnimeCommands.showRandomAnime();
   } else if (parsedArgs.query) {
     await AnimeCommands.searchAnime(
       parsedArgs.query,

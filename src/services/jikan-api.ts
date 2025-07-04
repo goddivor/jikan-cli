@@ -26,4 +26,10 @@ export class JikanApi {
     const response = await fetch(url);
     return await response.json();
   }
+
+  static async getRandomAnime(): Promise<JikanSingleResponse> {
+    const url = `${this.BASE_URL}/random/anime`;
+    const response = await fetch(url);
+    return await response.json();
+  }
 }

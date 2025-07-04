@@ -1,9 +1,13 @@
-import chalk from 'chalk';
-import { JikanApi } from '../services/jikan-api.js';
-import { DisplayUtils } from '../utils/display.js';
+import chalk from "chalk";
+import { JikanApi } from "../services/jikan-api.js";
+import { DisplayUtils } from "../utils/display.js";
 
 export class AnimeCommands {
-  static async searchAnime(query: string, limit: number, showDetails: boolean): Promise<void> {
+  static async searchAnime(
+    query: string,
+    limit: number,
+    showDetails: boolean
+  ): Promise<void> {
     try {
       const data = await JikanApi.searchAnime(query, limit);
 
@@ -67,6 +71,22 @@ export class AnimeCommands {
       data.data.forEach((anime, index) => {
         DisplayUtils.displayAnime(anime, index, false);
       });
+    } catch (error) {
+      DisplayUtils.displayError("Erreur lors de la requête :", error);
+    }
+  }
+
+  static async showRandomAnime(): Promise<void> {
+    try {
+      const data = await JikanApi.getRandomAnime();
+
+      if (!data.data) {
+        DisplayUtils.displayNoResults();
+        return;
+      }
+
+      DisplayUtils.displayRandomHeader();
+      DisplayUtils.displayAnimeDetails(data.data);
     } catch (error) {
       DisplayUtils.displayError("Erreur lors de la requête :", error);
     }
