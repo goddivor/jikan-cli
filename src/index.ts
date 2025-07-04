@@ -7,6 +7,7 @@ const args = process.argv.slice(2);
 const searchIndex = args.findIndex((arg) => arg === "-s" || arg === "--search");
 const limitIndex = args.findIndex((arg) => arg === "-l" || arg === "--limit");
 const idIndex = args.findIndex((arg) => arg === "-i" || arg === "--id");
+const detailsFlag = args.includes("-d") || args.includes("--details");
 
 const query = searchIndex !== -1 ? args[searchIndex + 1] : null;
 const limit =
@@ -18,11 +19,11 @@ const animeId = idIndex !== -1 ? args[idIndex + 1] : null;
 if (animeId) {
   getAnimeDetails(animeId);
 } else if (query) {
-  searchAnime(query, limit);
+  searchAnime(query, limit, detailsFlag);
 } else {
   console.log(
     chalk.redBright(
-      '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats]'
+      '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details]'
     )
   );
   console.log(chalk.redBright("   ou : jikan-cli -i id_de_l_anime"));
@@ -31,7 +32,7 @@ if (animeId) {
 
 // ========== MAIN FUNCTION ==========
 
-async function searchAnime(query: string, limit: number) {
+async function searchAnime(query: string, limit: number, showDetails: boolean) {
   const url = `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(
     query
   )}&limit=${limit}`;
@@ -70,6 +71,13 @@ async function searchAnime(query: string, limit: number) {
           anime.images?.jpg?.image_url || "Non disponible"
         )}`
       );
+      if (showDetails) {
+        console.log(
+          `   📝 ${chalk.yellowBright("Synopsis")} : ${
+            anime.synopsis ?? "Non disponible"
+          }`
+        );
+      }
       console.log(chalk.gray("---"));
     });
   } catch (error) {
