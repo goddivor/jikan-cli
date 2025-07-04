@@ -53,4 +53,22 @@ export class AnimeCommands {
       DisplayUtils.displayError("Erreur lors de la requête :", error);
     }
   }
+
+  static async showSeasonAnimes(year: string, season: string): Promise<void> {
+    try {
+      const data = await JikanApi.getSeasonAnimes(year, season);
+
+      if (!data.data || data.data.length === 0) {
+        DisplayUtils.displayNoResults();
+        return;
+      }
+
+      DisplayUtils.displaySeasonHeader(year, season);
+      data.data.forEach((anime, index) => {
+        DisplayUtils.displayAnime(anime, index, false);
+      });
+    } catch (error) {
+      DisplayUtils.displayError("Erreur lors de la requête :", error);
+    }
+  }
 }

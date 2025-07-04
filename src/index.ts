@@ -12,6 +12,13 @@ async function main(): Promise<void> {
     await AnimeCommands.getAnimeDetails(parsedArgs.animeId);
   } else if (parsedArgs.showTop) {
     await AnimeCommands.showTopAnimes(parsedArgs.topLimit);
+  } else if (parsedArgs.showSeason) {
+    if (!parsedArgs.seasonYear || !parsedArgs.seasonName) {
+      DisplayUtils.displayError("Année et saison requises pour --season");
+      DisplayUtils.displayUsage();
+      process.exit(1);
+    }
+    await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName);
   } else if (parsedArgs.query) {
     await AnimeCommands.searchAnime(
       parsedArgs.query,

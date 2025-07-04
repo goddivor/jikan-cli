@@ -20,4 +20,10 @@ export class JikanApi {
     const response = await fetch(url);
     return await response.json();
   }
+
+  static async getSeasonAnimes(year: string, season: string): Promise<JikanResponse> {
+    const url = `${this.BASE_URL}/seasons/${year}/${season}`;
+    const response = await fetch(url);
+    return await response.json();
+  }
 }

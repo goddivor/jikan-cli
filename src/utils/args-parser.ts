@@ -5,6 +5,9 @@ export interface ParsedArgs {
   topLimit: number;
   detailsFlag: boolean;
   showTop: boolean;
+  showSeason: boolean;
+  seasonYear?: string;
+  seasonName?: string;
 }
 
 export class ArgsParser {
@@ -13,6 +16,7 @@ export class ArgsParser {
     const limitIndex = args.findIndex((arg) => arg === "-l" || arg === "--limit");
     const idIndex = args.findIndex((arg) => arg === "-i" || arg === "--id");
     const topIndex = args.findIndex((arg) => arg === "-t" || arg === "--top");
+    const seasonIndex = args.findIndex((arg) => arg === "-ss" || arg === "--season");
     const detailsFlag = args.includes("-d") || args.includes("--details");
 
     const query = searchIndex !== -1 ? args[searchIndex + 1] : undefined;
@@ -24,6 +28,9 @@ export class ArgsParser {
       ? parseInt(args[topIndex + 1])
       : 10;
     const showTop = topIndex !== -1;
+    const showSeason = seasonIndex !== -1;
+    const seasonYear = seasonIndex !== -1 ? args[seasonIndex + 1] : undefined;
+    const seasonName = seasonIndex !== -1 ? args[seasonIndex + 2] : undefined;
 
     return {
       query,
@@ -31,7 +38,10 @@ export class ArgsParser {
       animeId,
       topLimit,
       detailsFlag,
-      showTop
+      showTop,
+      showSeason,
+      seasonYear,
+      seasonName
     };
   }
 }

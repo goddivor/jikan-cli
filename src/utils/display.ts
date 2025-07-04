@@ -40,6 +40,10 @@ export class DisplayUtils {
     console.log(chalk.cyanBright(`🏆 Top ${limit} des animés :\n`));
   }
 
+  static displaySeasonHeader(year: string, season: string): void {
+    console.log(chalk.cyanBright(`🌸 Animés de la saison ${chalk.bold(season)} ${chalk.bold(year)} :\n`));
+  }
+
   static displayError(message: string, error?: any): void {
     console.error(chalk.red(`❌ ${message}`), error || '');
   }
@@ -56,5 +60,6 @@ export class DisplayUtils {
     );
     console.log(chalk.redBright("   ou : jikan-cli -i id_de_l_anime"));
     console.log(chalk.redBright("   ou : jikan-cli --top [n]"));
+    console.log(chalk.redBright("   ou : jikan-cli --season année saison"));
   }
 }
