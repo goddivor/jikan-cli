@@ -72,12 +72,21 @@ export class DisplayUtils {
     );
   }
 
-  static displaySearchHeader(query: string, limit: number): void {
-    console.log(
-      chalk.cyanBright(
-        `🔍 Résultats pour "${chalk.bold(query)}" (${limit} max) :\n`
-      )
-    );
+  static displaySearchHeader(
+    query: string,
+    limit: number,
+    type?: string,
+    status?: string
+  ): void {
+    let headerText = `🔍 Résultats pour "${chalk.bold(query)}" (${limit} max)`;
+
+    if (type || status) {
+      headerText += " - Filtres :";
+      if (type) headerText += ` type=${type}`;
+      if (status) headerText += ` status=${status}`;
+    }
+
+    console.log(chalk.cyanBright(`${headerText} :\n`));
   }
 
   static displayTopHeader(limit: number): void {
@@ -107,12 +116,18 @@ export class DisplayUtils {
   static displayUsage(): void {
     console.log(
       chalk.redBright(
-        '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details]'
+        '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details] [--type type] [--status status]'
       )
     );
     console.log(chalk.redBright("   ou : jikan-cli -i/--id id_de_l_anime"));
     console.log(chalk.redBright("   ou : jikan-cli -t/--top [n]"));
     console.log(chalk.redBright("   ou : jikan-cli -ss/--season année saison"));
     console.log(chalk.redBright("   ou : jikan-cli -r/--random"));
+    console.log(chalk.redBright(""));
+    console.log(chalk.redBright("   Filtres disponibles :"));
+    console.log(
+      chalk.redBright("   --type : tv, movie, ova, special, ona, music")
+    );
+    console.log(chalk.redBright("   --status : airing, completed, upcoming"));
   }
 }

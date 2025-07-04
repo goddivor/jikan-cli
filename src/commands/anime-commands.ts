@@ -6,17 +6,19 @@ export class AnimeCommands {
   static async searchAnime(
     query: string,
     limit: number,
-    showDetails: boolean
+    showDetails: boolean,
+    type?: string,
+    status?: string
   ): Promise<void> {
     try {
-      const data = await JikanApi.searchAnime(query, limit);
+      const data = await JikanApi.searchAnime(query, limit, type, status);
 
       if (!data.data || data.data.length === 0) {
         DisplayUtils.displayNoResults();
         return;
       }
 
-      DisplayUtils.displaySearchHeader(query, limit);
+      DisplayUtils.displaySearchHeader(query, limit, type, status);
       data.data.forEach((anime, index) => {
         DisplayUtils.displayAnime(anime, index, showDetails);
       });

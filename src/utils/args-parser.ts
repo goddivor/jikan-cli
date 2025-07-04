@@ -9,6 +9,8 @@ export interface ParsedArgs {
   seasonYear?: string;
   seasonName?: string;
   showRandom: boolean;
+  type?: string;
+  status?: string;
 }
 
 export class ArgsParser {
@@ -24,7 +26,12 @@ export class ArgsParser {
     const seasonIndex = args.findIndex(
       (arg) => arg === "-ss" || arg === "--season"
     );
-    const randomIndex = args.findIndex((arg) => arg === "-r" || arg === "--random");
+    const randomIndex = args.findIndex(
+      (arg) => arg === "-r" || arg === "--random"
+    );
+
+    const typeIndex = args.findIndex((arg) => arg === "--type");
+    const statusIndex = args.findIndex((arg) => arg === "--status");
 
     const detailsFlag = args.includes("-d") || args.includes("--details");
 
@@ -44,6 +51,8 @@ export class ArgsParser {
     const showSeason = seasonIndex !== -1;
     const seasonYear = seasonIndex !== -1 ? args[seasonIndex + 1] : undefined;
     const seasonName = seasonIndex !== -1 ? args[seasonIndex + 2] : undefined;
+    const type = typeIndex !== -1 ? args[typeIndex + 1] : undefined;
+    const status = statusIndex !== -1 ? args[statusIndex + 1] : undefined;
     const showRandom = randomIndex !== -1;
 
     return {
@@ -57,6 +66,8 @@ export class ArgsParser {
       seasonYear,
       seasonName,
       showRandom,
+      type,
+      status,
     };
   }
 }

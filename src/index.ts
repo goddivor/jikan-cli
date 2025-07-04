@@ -25,7 +25,9 @@ async function main(): Promise<void> {
     await AnimeCommands.searchAnime(
       parsedArgs.query,
       parsedArgs.limit,
-      parsedArgs.detailsFlag
+      parsedArgs.detailsFlag,
+      parsedArgs.type,
+      parsedArgs.status
     );
   } else {
     DisplayUtils.displayUsage();
