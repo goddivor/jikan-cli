@@ -14,7 +14,7 @@ async function main(): Promise<void> {
     await AnimeCommands.showTopAnimes(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder);
   } else if (parsedArgs.showSeason) {
     if (!parsedArgs.seasonYear || !parsedArgs.seasonName) {
-      DisplayUtils.displayError("Année et saison requises pour --season");
+      DisplayUtils.displayError("Year and season required for --season");
       DisplayUtils.displayUsage();
       process.exit(1);
     }
@@ -38,6 +38,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  DisplayUtils.displayError("Erreur inattendue :", error);
+  DisplayUtils.displayError("Unexpected error:", error);
   process.exit(1);
 });

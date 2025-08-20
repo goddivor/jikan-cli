@@ -1,41 +1,49 @@
 # 📺 jikan-cli
 
-> Une application CLI simple et rapide pour rechercher des animés depuis l'API [Jikan](https://jikan.moe), écrite en TypeScript.
+> A fast and simple CLI application to search for anime using the [Jikan API](https://jikan.moe), written in TypeScript.
 
 ---
 
-## 🚀 Fonctionnalités
+## 🚀 Features
 
-- Recherche d'anime par nom (`-s` ou `--search`)
-- Définir le nombre de résultats (`-l` ou `--limit`)
-- Affichage :
-  - Titre
-  - Année de sortie
-  - Score
-  - Nombre d’épisodes
-  - Lien vers MyAnimeList
-  - Lien de l'image de l'anime
-- Résultats stylisés avec [chalk](https://www.npmjs.com/package/chalk)
+- **Anime Search** by name (`-s` or `--search`)
+- **Top Anime** listing (`-t` or `--top`)
+- **Seasonal Anime** (`-ss` or `--season`)
+- **Random Anime** (`-r` or `--random`)
+- **Anime Details** by ID (`-i` or `--id`)
+- **Advanced Filtering**:
+  - Type: TV, Movie, OVA, Special, ONA, Music
+  - Status: Airing, Completed, Upcoming
+- **Comprehensive Sorting Options**:
+  - Sort by: Score, Members, Start Date, Title, Rank, Popularity
+  - Order: Ascending or Descending
+- **Rich Display**:
+  - Title and year
+  - Score and episode count
+  - MyAnimeList link
+  - Image URL
+  - Synopsis (with `--details` flag)
+- **Colorized Output** with [chalk](https://www.npmjs.com/package/chalk)
 
 ---
 
 ## 📦 Installation
 
-### 1. Cloner le repo et installer les dépendances
+### 1. Clone and install dependencies
 
 ```bash
-git clone https://github.com/ton-utilisateur/jikan-cli.git
+git clone https://github.com/goddivor/jikan-cli.git
 cd jikan-cli
 npm install
-````
+```
 
-### 2. Compiler le projet
+### 2. Build the project
 
 ```bash
 npm run build
 ```
 
-### 3. Installer la commande globalement
+### 3. Install globally (optional)
 
 ```bash
 npm install -g .
@@ -43,71 +51,147 @@ npm install -g .
 
 ---
 
-## 🧪 Utilisation
+## 🧪 Usage
 
-### Recherche de base
+### Basic Search
 
 ```bash
 jikan-cli -s "naruto"
 ```
 
-### Recherche avec nombre de résultats
+### Search with Limit and Details
 
 ```bash
-jikan-cli -s "bleach" -l 3
+jikan-cli -s "attack on titan" -l 3 --details
 ```
 
-### Alias
+### Advanced Search with Filters and Sorting
 
-* `-s`, `--search` : le nom de l'anime
-* `-l`, `--limit` : nombre de résultats à afficher (par défaut : 5)
+```bash
+jikan-cli -s "dragon ball" --type movie --sort score --order desc
+```
+
+### Top Anime
+
+```bash
+jikan-cli -t 10 --sort members --order desc
+```
+
+### Seasonal Anime
+
+```bash
+jikan-cli -ss 2023 fall --sort score --order desc
+```
+
+### Random Anime
+
+```bash
+jikan-cli -r
+```
+
+### Anime Details by ID
+
+```bash
+jikan-cli -i 1735
+```
 
 ---
 
-## 📸 Exemple de sortie
+## 📋 Command Reference
+
+### Main Commands
+- `-s`, `--search` : Search anime by name
+- `-t`, `--top` : Show top anime (default: 10)
+- `-ss`, `--season` : Show anime from specific season (year season)
+- `-r`, `--random` : Show random anime
+- `-i`, `--id` : Show anime details by ID
+
+### Options
+- `-l`, `--limit` : Number of results to display (default: 5)
+- `-d`, `--details` : Show detailed information including synopsis
+
+### Filters
+- `--type` : Filter by type (tv, movie, ova, special, ona, music)
+- `--status` : Filter by status (airing, completed, upcoming)
+
+### Sorting
+- `--sort` : Sort by criteria (score, members, start_date, title, rank, popularity)
+- `--order` : Sort order (asc, desc - default: desc)
+
+---
+
+## 📸 Example Output
 
 ```
-🔍 Résultats pour "dragon ball" (3 max) :
+🔍 Search results for "jujutsu kaisen" (3 max) - Filters: sort=score, order=desc:
 
-1. Dragon Ball (1986)
-   Score : 7.98 | Épisodes : 153
-   https://myanimelist.net/anime/223/Dragon_Ball
-   🖼️ Image : https://cdn.myanimelist.net/images/anime/13/13225.jpg
+1. Jujutsu Kaisen (2020)
+   Score: 8.54 | Episodes: 24
+   https://myanimelist.net/anime/40748/Jujutsu_Kaisen
+   🖼️ Image: https://cdn.myanimelist.net/images/anime/1171/109222.jpg
+---
+2. Jujutsu Kaisen 2nd Season (2023)
+   Score: 8.85 | Episodes: 23
+   https://myanimelist.net/anime/51009/Jujutsu_Kaisen_2nd_Season
+   🖼️ Image: https://cdn.myanimelist.net/images/anime/1792/138022.jpg
 ---
 ...
 ```
 
 ---
 
-## 🧱 Structure du projet
+## 🏗️ Project Structure
 
 ```
 jikan-cli/
 ├── src/
-│   └── index.ts       # Point d’entrée principal du CLI
-├── dist/              # Fichiers compilés
-├── package.json       # Dépendances & métadonnées CLI
-├── tsconfig.json      # Configuration TypeScript
+│   ├── commands/          # Command implementations
+│   │   └── anime-commands.ts
+│   ├── services/          # API service layer
+│   │   └── jikan-api.ts
+│   ├── types/             # TypeScript type definitions
+│   │   └── anime.ts
+│   ├── utils/             # Utility functions
+│   │   ├── args-parser.ts
+│   │   └── display.ts
+│   └── index.ts           # Main CLI entry point
+├── dist/                  # Compiled JavaScript files
+├── package.json           # Dependencies & CLI metadata
+├── tsconfig.json          # TypeScript configuration
+└── LICENSE               # MIT License
 ```
 
 ---
 
-## 🛠️ Technologies utilisées
+## 🛠️ Technologies Used
 
-* [TypeScript](https://www.typescriptlang.org/)
-* [Node.js](https://nodejs.org/)
-* [Jikan API](https://jikan.moe)
-* [chalk](https://www.npmjs.com/package/chalk)
-
----
-
-## 📃 Licence
-
-MIT © 2025 - Créé par [TonNom](https://github.com/ton-utilisateur)
-
-```
+- [TypeScript](https://www.typescriptlang.org/) - Type-safe JavaScript
+- [Node.js](https://nodejs.org/) - JavaScript runtime
+- [Jikan API](https://jikan.moe) - Unofficial MyAnimeList API
+- [chalk](https://www.npmjs.com/package/chalk) - Terminal styling
 
 ---
 
-Souhaites-tu aussi que je te génère le `package.json` prêt pour publication sur npm, ou un logo/bannière CLI stylisé en ASCII art ?
-```
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📃 License
+
+MIT © 2025 - [View License](./LICENSE)
+
+---
+
+## 🔗 Links
+
+- [Jikan API Documentation](https://docs.api.jikan.moe/)
+- [MyAnimeList](https://myanimelist.net/)
+- [Report Issues](https://github.com/goddivor/jikan-cli/issues)

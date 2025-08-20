@@ -25,7 +25,7 @@ export class AnimeCommands {
         DisplayUtils.displayAnime(anime, index, showDetails);
       });
     } catch (error) {
-      DisplayUtils.displayError("Erreur lors de la requête :", error);
+      DisplayUtils.displayError("Error during request:", error);
     }
   }
 
@@ -40,7 +40,7 @@ export class AnimeCommands {
 
       DisplayUtils.displayAnimeDetails(data.data);
     } catch (error) {
-      DisplayUtils.displayError("Erreur lors de la requête :", error);
+      DisplayUtils.displayError("Error during request:", error);
     }
   }
 
@@ -62,7 +62,7 @@ export class AnimeCommands {
         DisplayUtils.displayAnime(anime, index, false);
       });
     } catch (error) {
-      DisplayUtils.displayError("Erreur lors de la requête :", error);
+      DisplayUtils.displayError("Error during request:", error);
     }
   }
 
@@ -85,7 +85,7 @@ export class AnimeCommands {
         DisplayUtils.displayAnime(anime, index, false);
       });
     } catch (error) {
-      DisplayUtils.displayError("Erreur lors de la requête :", error);
+      DisplayUtils.displayError("Error during request:", error);
     }
   }
 
@@ -101,7 +101,7 @@ export class AnimeCommands {
       DisplayUtils.displayRandomHeader();
       DisplayUtils.displayAnimeDetails(data.data);
     } catch (error) {
-      DisplayUtils.displayError("Erreur lors de la requête :", error);
+      DisplayUtils.displayError("Error during request:", error);
     }
   }
 }

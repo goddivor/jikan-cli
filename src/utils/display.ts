@@ -10,26 +10,26 @@ export class DisplayUtils {
     console.log(
       chalk.green(
         `${index + 1}. ${chalk.bold(anime.title)} (${
-          anime.year || "Année inconnue"
+          anime.year || "Unknown year"
         })`
       )
     );
     console.log(
-      `   ${chalk.magentaBright("Score")} : ${
+      `   ${chalk.magentaBright("Score")}: ${
         anime.score ?? "N/A"
-      } | ${chalk.magentaBright("Épisodes")} : ${anime.episodes ?? "N/A"}`
+      } | ${chalk.magentaBright("Episodes")}: ${anime.episodes ?? "N/A"}`
     );
     console.log(`   ${chalk.blueBright(anime.url)}`);
     console.log(
-      `   🖼️ Image : ${chalk.gray(
-        anime.images?.jpg?.image_url || "Non disponible"
+      `   🖼️ Image: ${chalk.gray(
+        anime.images?.jpg?.image_url || "Not available"
       )}`
     );
 
     if (showDetails) {
       console.log(
-        `   📝 ${chalk.yellowBright("Synopsis")} : ${
-          anime.synopsis ?? "Non disponible"
+        `   📝 ${chalk.yellowBright("Synopsis")}: ${
+          anime.synopsis ?? "Not available"
         }`
       );
     }
@@ -39,35 +39,35 @@ export class DisplayUtils {
 
   static displayAnimeDetails(anime: AnimeData): void {
     console.log(
-      chalk.cyanBright(`📋 Détails pour l'anime : ${chalk.bold(anime.title)}\n`)
+      chalk.cyanBright(`📋 Anime details: ${chalk.bold(anime.title)}\n`)
     );
     console.log(
-      `${chalk.magentaBright("Synopsis")} : ${
-        anime.synopsis ?? "Non disponible"
+      `${chalk.magentaBright("Synopsis")}: ${
+        anime.synopsis ?? "Not available"
       }`
     );
-    console.log(`${chalk.magentaBright("Type")} : ${anime.type ?? "N/A"}`);
+    console.log(`${chalk.magentaBright("Type")}: ${anime.type ?? "N/A"}`);
     console.log(
-      `${chalk.magentaBright("Episodes")} : ${anime.episodes ?? "N/A"}`
+      `${chalk.magentaBright("Episodes")}: ${anime.episodes ?? "N/A"}`
     );
-    console.log(`${chalk.magentaBright("Score")} : ${anime.score ?? "N/A"}`);
-    console.log(`${chalk.magentaBright("Statut")} : ${anime.status ?? "N/A"}`);
+    console.log(`${chalk.magentaBright("Score")}: ${anime.score ?? "N/A"}`);
+    console.log(`${chalk.magentaBright("Status")}: ${anime.status ?? "N/A"}`);
     console.log(
-      `${chalk.magentaBright("Début diffusion")} : ${
+      `${chalk.magentaBright("Aired")}: ${
         anime.aired?.string ?? "N/A"
       }`
     );
     console.log(
-      `${chalk.magentaBright("Genres")} : ${
+      `${chalk.magentaBright("Genres")}: ${
         anime.genres?.map((g) => g.name).join(", ") ?? "N/A"
       }`
     );
     console.log(
-      `${chalk.magentaBright("Site")} : ${chalk.blueBright(anime.url)}`
+      `${chalk.magentaBright("Website")}: ${chalk.blueBright(anime.url)}`
     );
     console.log(
-      `🖼️ Image : ${chalk.gray(
-        anime.images?.jpg?.image_url || "Non disponible"
+      `🖼️ Image: ${chalk.gray(
+        anime.images?.jpg?.image_url || "Not available"
       )}`
     );
   }
@@ -80,19 +80,19 @@ export class DisplayUtils {
     orderBy?: string,
     sortOrder?: string
   ): void {
-    let headerText = `🔍 Résultats pour "${chalk.bold(query)}" (${limit} max)`;
+    let headerText = `🔍 Search results for "${chalk.bold(query)}" (${limit} max)`;
 
     const filters = [];
     if (type) filters.push(`type=${type}`);
     if (status) filters.push(`status=${status}`);
-    if (orderBy) filters.push(`tri=${orderBy}`);
-    if (sortOrder) filters.push(`ordre=${sortOrder}`);
+    if (orderBy) filters.push(`sort=${orderBy}`);
+    if (sortOrder) filters.push(`order=${sortOrder}`);
 
     if (filters.length > 0) {
-      headerText += ` - Filtres : ${filters.join(", ")}`;
+      headerText += ` - Filters: ${filters.join(", ")}`;
     }
 
-    console.log(chalk.cyanBright(`${headerText} :\n`));
+    console.log(chalk.cyanBright(`${headerText}:\n`));
   }
 
   static displayTopHeader(
@@ -100,16 +100,16 @@ export class DisplayUtils {
     orderBy?: string,
     sortOrder?: string
   ): void {
-    let headerText = `🏆 Top ${limit} des animés`;
+    let headerText = `🏆 Top ${limit} anime`;
 
     if (orderBy || sortOrder) {
       const sortInfo = [];
-      if (orderBy) sortInfo.push(`tri=${orderBy}`);
-      if (sortOrder) sortInfo.push(`ordre=${sortOrder}`);
+      if (orderBy) sortInfo.push(`sort=${orderBy}`);
+      if (sortOrder) sortInfo.push(`order=${sortOrder}`);
       headerText += ` - ${sortInfo.join(", ")}`;
     }
 
-    console.log(chalk.cyanBright(`${headerText} :\n`));
+    console.log(chalk.cyanBright(`${headerText}:\n`));
   }
 
   static displaySeasonHeader(
@@ -118,20 +118,20 @@ export class DisplayUtils {
     orderBy?: string,
     sortOrder?: string
   ): void {
-    let headerText = `🌸 Animés de la saison ${chalk.bold(season)} ${chalk.bold(year)}`;
+    let headerText = `🌸 Anime from ${chalk.bold(season)} ${chalk.bold(year)} season`;
 
     if (orderBy || sortOrder) {
       const sortInfo = [];
-      if (orderBy) sortInfo.push(`tri=${orderBy}`);
-      if (sortOrder) sortInfo.push(`ordre=${sortOrder}`);
+      if (orderBy) sortInfo.push(`sort=${orderBy}`);
+      if (sortOrder) sortInfo.push(`order=${sortOrder}`);
       headerText += ` - ${sortInfo.join(", ")}`;
     }
 
-    console.log(chalk.cyanBright(`${headerText} :\n`));
+    console.log(chalk.cyanBright(`${headerText}:\n`));
   }
 
   static displayRandomHeader(): void {
-    console.log(chalk.cyanBright(`🎲 Anime aléatoire :\n`));
+    console.log(chalk.cyanBright(`🎲 Random anime:\n`));
   }
 
   static displayError(message: string, error?: any): void {
@@ -139,28 +139,28 @@ export class DisplayUtils {
   }
 
   static displayNoResults(): void {
-    console.log(chalk.yellowBright("😢 Aucun résultat trouvé."));
+    console.log(chalk.yellowBright("😢 No results found."));
   }
 
   static displayUsage(): void {
     console.log(
       chalk.redBright(
-        '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details] [--type type] [--status status] [--sort critère] [--order asc/desc]'
+        '❌ Usage: jikan-cli -s "anime name" [-l limit] [--details] [--type type] [--status status] [--sort criteria] [--order asc/desc]'
       )
     );
-    console.log(chalk.redBright("   ou : jikan-cli -i/--id id_de_l_anime"));
-    console.log(chalk.redBright("   ou : jikan-cli -t/--top [n] [--sort critère] [--order asc/desc]"));
-    console.log(chalk.redBright("   ou : jikan-cli -ss/--season année saison [--sort critère] [--order asc/desc]"));
-    console.log(chalk.redBright("   ou : jikan-cli -r/--random"));
+    console.log(chalk.redBright("   or: jikan-cli -i/--id anime_id"));
+    console.log(chalk.redBright("   or: jikan-cli -t/--top [n] [--sort criteria] [--order asc/desc]"));
+    console.log(chalk.redBright("   or: jikan-cli -ss/--season year season [--sort criteria] [--order asc/desc]"));
+    console.log(chalk.redBright("   or: jikan-cli -r/--random"));
     console.log(chalk.redBright(""));
-    console.log(chalk.redBright("   Filtres disponibles :"));
+    console.log(chalk.redBright("   Available filters:"));
     console.log(
-      chalk.redBright("   --type : tv, movie, ova, special, ona, music")
+      chalk.redBright("   --type: tv, movie, ova, special, ona, music")
     );
-    console.log(chalk.redBright("   --status : airing, completed, upcoming"));
+    console.log(chalk.redBright("   --status: airing, completed, upcoming"));
     console.log(chalk.redBright(""));
-    console.log(chalk.redBright("   Options de tri disponibles :"));
-    console.log(chalk.redBright("   --sort : score, members, start_date, title, rank, popularity"));
-    console.log(chalk.redBright("   --order : asc (croissant), desc (décroissant, défaut)"));
+    console.log(chalk.redBright("   Available sorting options:"));
+    console.log(chalk.redBright("   --sort: score, members, start_date, title, rank, popularity"));
+    console.log(chalk.redBright("   --order: asc (ascending), desc (descending, default)"));
   }
 }
