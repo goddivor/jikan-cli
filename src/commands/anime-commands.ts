@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { JikanApi } from "../services/jikan-api.js";
-import { DisplayUtils } from "../utils/display.js";
+import { JikanApi } from "../services/jikan-api";
+import { DisplayUtils } from "../utils/display";
 
 export class AnimeCommands {
   static async searchAnime(
@@ -8,17 +8,19 @@ export class AnimeCommands {
     limit: number,
     showDetails: boolean,
     type?: string,
-    status?: string
+    status?: string,
+    orderBy?: string,
+    sortOrder?: string
   ): Promise<void> {
     try {
-      const data = await JikanApi.searchAnime(query, limit, type, status);
+      const data = await JikanApi.searchAnime(query, limit, type, status, orderBy, sortOrder);
 
       if (!data.data || data.data.length === 0) {
         DisplayUtils.displayNoResults();
         return;
       }
 
-      DisplayUtils.displaySearchHeader(query, limit, type, status);
+      DisplayUtils.displaySearchHeader(query, limit, type, status, orderBy, sortOrder);
       data.data.forEach((anime, index) => {
         DisplayUtils.displayAnime(anime, index, showDetails);
       });
@@ -42,16 +44,20 @@ export class AnimeCommands {
     }
   }
 
-  static async showTopAnimes(limit: number): Promise<void> {
+  static async showTopAnimes(
+    limit: number,
+    orderBy?: string,
+    sortOrder?: string
+  ): Promise<void> {
     try {
-      const data = await JikanApi.getTopAnimes(limit);
+      const data = await JikanApi.getTopAnimes(limit, orderBy, sortOrder);
 
       if (!data.data || data.data.length === 0) {
         DisplayUtils.displayNoResults();
         return;
       }
 
-      DisplayUtils.displayTopHeader(limit);
+      DisplayUtils.displayTopHeader(limit, orderBy, sortOrder);
       data.data.forEach((anime, index) => {
         DisplayUtils.displayAnime(anime, index, false);
       });
@@ -60,16 +66,21 @@ export class AnimeCommands {
     }
   }
 
-  static async showSeasonAnimes(year: string, season: string): Promise<void> {
+  static async showSeasonAnimes(
+    year: string,
+    season: string,
+    orderBy?: string,
+    sortOrder?: string
+  ): Promise<void> {
     try {
-      const data = await JikanApi.getSeasonAnimes(year, season);
+      const data = await JikanApi.getSeasonAnimes(year, season, orderBy, sortOrder);
 
       if (!data.data || data.data.length === 0) {
         DisplayUtils.displayNoResults();
         return;
       }
 
-      DisplayUtils.displaySeasonHeader(year, season);
+      DisplayUtils.displaySeasonHeader(year, season, orderBy, sortOrder);
       data.data.forEach((anime, index) => {
         DisplayUtils.displayAnime(anime, index, false);
       });

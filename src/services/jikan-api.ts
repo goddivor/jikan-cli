@@ -1,4 +1,4 @@
-import { JikanResponse, JikanSingleResponse } from "../types/anime.js";
+import { JikanResponse, JikanSingleResponse } from "../types/anime";
 
 export class JikanApi {
   private static readonly BASE_URL = "https://api.jikan.moe/v4";
@@ -7,7 +7,9 @@ export class JikanApi {
     query: string,
     limit: number,
     type?: string,
-    status?: string
+    status?: string,
+    orderBy?: string,
+    sortOrder?: string
   ): Promise<JikanResponse> {
     let url = `${this.BASE_URL}/anime?q=${encodeURIComponent(
       query
@@ -21,6 +23,14 @@ export class JikanApi {
       url += `&status=${encodeURIComponent(status)}`;
     }
 
+    if (orderBy) {
+      url += `&order_by=${encodeURIComponent(orderBy)}`;
+    }
+
+    if (sortOrder) {
+      url += `&sort=${encodeURIComponent(sortOrder)}`;
+    }
+
     const response = await fetch(url);
     return await response.json();
   }
@@ -31,17 +41,42 @@ export class JikanApi {
     return await response.json();
   }
 
-  static async getTopAnimes(limit: number): Promise<JikanResponse> {
-    const url = `${this.BASE_URL}/top/anime?limit=${limit}`;
+  static async getTopAnimes(
+    limit: number,
+    orderBy?: string,
+    sortOrder?: string
+  ): Promise<JikanResponse> {
+    let url = `${this.BASE_URL}/top/anime?limit=${limit}`;
+
+    if (orderBy) {
+      url += `&order_by=${encodeURIComponent(orderBy)}`;
+    }
+
+    if (sortOrder) {
+      url += `&sort=${encodeURIComponent(sortOrder)}`;
+    }
+
     const response = await fetch(url);
     return await response.json();
   }
 
   static async getSeasonAnimes(
     year: string,
-    season: string
+    season: string,
+    orderBy?: string,
+    sortOrder?: string
   ): Promise<JikanResponse> {
-    const url = `${this.BASE_URL}/seasons/${year}/${season}`;
+    let url = `${this.BASE_URL}/seasons/${year}/${season}`;
+
+    if (orderBy) {
+      url += `?order_by=${encodeURIComponent(orderBy)}`;
+      if (sortOrder) {
+        url += `&sort=${encodeURIComponent(sortOrder)}`;
+      }
+    } else if (sortOrder) {
+      url += `?sort=${encodeURIComponent(sortOrder)}`;
+    }
+
     const response = await fetch(url);
     return await response.json();
   }

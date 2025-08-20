@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { AnimeData } from "../types/anime.js";
+import { AnimeData } from "../types/anime";
 
 export class DisplayUtils {
   static displayAnime(
@@ -76,29 +76,58 @@ export class DisplayUtils {
     query: string,
     limit: number,
     type?: string,
-    status?: string
+    status?: string,
+    orderBy?: string,
+    sortOrder?: string
   ): void {
     let headerText = `🔍 Résultats pour "${chalk.bold(query)}" (${limit} max)`;
 
-    if (type || status) {
-      headerText += " - Filtres :";
-      if (type) headerText += ` type=${type}`;
-      if (status) headerText += ` status=${status}`;
+    const filters = [];
+    if (type) filters.push(`type=${type}`);
+    if (status) filters.push(`status=${status}`);
+    if (orderBy) filters.push(`tri=${orderBy}`);
+    if (sortOrder) filters.push(`ordre=${sortOrder}`);
+
+    if (filters.length > 0) {
+      headerText += ` - Filtres : ${filters.join(", ")}`;
     }
 
     console.log(chalk.cyanBright(`${headerText} :\n`));
   }
 
-  static displayTopHeader(limit: number): void {
-    console.log(chalk.cyanBright(`🏆 Top ${limit} des animés :\n`));
+  static displayTopHeader(
+    limit: number,
+    orderBy?: string,
+    sortOrder?: string
+  ): void {
+    let headerText = `🏆 Top ${limit} des animés`;
+
+    if (orderBy || sortOrder) {
+      const sortInfo = [];
+      if (orderBy) sortInfo.push(`tri=${orderBy}`);
+      if (sortOrder) sortInfo.push(`ordre=${sortOrder}`);
+      headerText += ` - ${sortInfo.join(", ")}`;
+    }
+
+    console.log(chalk.cyanBright(`${headerText} :\n`));
   }
 
-  static displaySeasonHeader(year: string, season: string): void {
-    console.log(
-      chalk.cyanBright(
-        `🌸 Animés de la saison ${chalk.bold(season)} ${chalk.bold(year)} :\n`
-      )
-    );
+  static displaySeasonHeader(
+    year: string,
+    season: string,
+    orderBy?: string,
+    sortOrder?: string
+  ): void {
+    let headerText = `🌸 Animés de la saison ${chalk.bold(season)} ${chalk.bold(year)}`;
+
+    if (orderBy || sortOrder) {
+      const sortInfo = [];
+      if (orderBy) sortInfo.push(`tri=${orderBy}`);
+      if (sortOrder) sortInfo.push(`ordre=${sortOrder}`);
+      headerText += ` - ${sortInfo.join(", ")}`;
+    }
+
+    console.log(chalk.cyanBright(`${headerText} :\n`));
   }
 
   static displayRandomHeader(): void {
@@ -116,12 +145,12 @@ export class DisplayUtils {
   static displayUsage(): void {
     console.log(
       chalk.redBright(
-        '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details] [--type type] [--status status]'
+        '❌ Usage : jikan-cli -s "nom de l\'anime" [-l nombre_de_resultats] [--details] [--type type] [--status status] [--sort critère] [--order asc/desc]'
       )
     );
     console.log(chalk.redBright("   ou : jikan-cli -i/--id id_de_l_anime"));
-    console.log(chalk.redBright("   ou : jikan-cli -t/--top [n]"));
-    console.log(chalk.redBright("   ou : jikan-cli -ss/--season année saison"));
+    console.log(chalk.redBright("   ou : jikan-cli -t/--top [n] [--sort critère] [--order asc/desc]"));
+    console.log(chalk.redBright("   ou : jikan-cli -ss/--season année saison [--sort critère] [--order asc/desc]"));
     console.log(chalk.redBright("   ou : jikan-cli -r/--random"));
     console.log(chalk.redBright(""));
     console.log(chalk.redBright("   Filtres disponibles :"));
@@ -129,5 +158,9 @@ export class DisplayUtils {
       chalk.redBright("   --type : tv, movie, ova, special, ona, music")
     );
     console.log(chalk.redBright("   --status : airing, completed, upcoming"));
+    console.log(chalk.redBright(""));
+    console.log(chalk.redBright("   Options de tri disponibles :"));
+    console.log(chalk.redBright("   --sort : score, members, start_date, title, rank, popularity"));
+    console.log(chalk.redBright("   --order : asc (croissant), desc (décroissant, défaut)"));
   }
 }

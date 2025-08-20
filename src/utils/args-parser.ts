@@ -11,6 +11,8 @@ export interface ParsedArgs {
   showRandom: boolean;
   type?: string;
   status?: string;
+  orderBy?: string;
+  sortOrder?: string;
 }
 
 export class ArgsParser {
@@ -32,6 +34,8 @@ export class ArgsParser {
 
     const typeIndex = args.findIndex((arg) => arg === "--type");
     const statusIndex = args.findIndex((arg) => arg === "--status");
+    const orderByIndex = args.findIndex((arg) => arg === "--sort" || arg === "--order-by");
+    const sortOrderIndex = args.findIndex((arg) => arg === "--order" || arg === "--sort-order");
 
     const detailsFlag = args.includes("-d") || args.includes("--details");
 
@@ -53,6 +57,8 @@ export class ArgsParser {
     const seasonName = seasonIndex !== -1 ? args[seasonIndex + 2] : undefined;
     const type = typeIndex !== -1 ? args[typeIndex + 1] : undefined;
     const status = statusIndex !== -1 ? args[statusIndex + 1] : undefined;
+    const orderBy = orderByIndex !== -1 ? args[orderByIndex + 1] : undefined;
+    const sortOrder = sortOrderIndex !== -1 ? args[sortOrderIndex + 1] : "desc";
     const showRandom = randomIndex !== -1;
 
     return {
@@ -68,6 +74,8 @@ export class ArgsParser {
       showRandom,
       type,
       status,
+      orderBy,
+      sortOrder,
     };
   }
 }
