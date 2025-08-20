@@ -11,14 +11,14 @@ async function main(): Promise<void> {
   if (parsedArgs.animeId) {
     await AnimeCommands.getAnimeDetails(parsedArgs.animeId);
   } else if (parsedArgs.showTop) {
-    await AnimeCommands.showTopAnimes(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder);
+    await AnimeCommands.showTopAnimes(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
   } else if (parsedArgs.showSeason) {
     if (!parsedArgs.seasonYear || !parsedArgs.seasonName) {
       DisplayUtils.displayError("Year and season required for --season");
       DisplayUtils.displayUsage();
       process.exit(1);
     }
-    await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName, parsedArgs.orderBy, parsedArgs.sortOrder);
+    await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
   } else if (parsedArgs.showRandom) {
     await AnimeCommands.showRandomAnime();
   } else if (parsedArgs.query) {
@@ -29,7 +29,8 @@ async function main(): Promise<void> {
       parsedArgs.type,
       parsedArgs.status,
       parsedArgs.orderBy,
-      parsedArgs.sortOrder
+      parsedArgs.sortOrder,
+      parsedArgs.interactive
     );
   } else {
     DisplayUtils.displayUsage();

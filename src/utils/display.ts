@@ -145,13 +145,17 @@ export class DisplayUtils {
   static displayUsage(): void {
     console.log(
       chalk.redBright(
-        '❌ Usage: jikan-cli -s "anime name" [-l limit] [--details] [--type type] [--status status] [--sort criteria] [--order asc/desc]'
+        '❌ Usage: jikan-cli -s "anime name" [-l limit] [--details] [--interactive] [--type type] [--status status] [--sort criteria] [--order asc/desc]'
       )
     );
     console.log(chalk.redBright("   or: jikan-cli -i/--id anime_id"));
-    console.log(chalk.redBright("   or: jikan-cli -t/--top [n] [--sort criteria] [--order asc/desc]"));
-    console.log(chalk.redBright("   or: jikan-cli -ss/--season year season [--sort criteria] [--order asc/desc]"));
+    console.log(chalk.redBright("   or: jikan-cli -t/--top [n] [--interactive] [--sort criteria] [--order asc/desc]"));
+    console.log(chalk.redBright("   or: jikan-cli -ss/--season year season [--interactive] [--sort criteria] [--order asc/desc]"));
     console.log(chalk.redBright("   or: jikan-cli -r/--random"));
+    console.log(chalk.redBright(""));
+    console.log(chalk.redBright("   Options:"));
+    console.log(chalk.redBright("   -d, --details: Show detailed information including synopsis"));
+    console.log(chalk.redBright("   --interactive: Enable interactive mode with selectable list"));
     console.log(chalk.redBright(""));
     console.log(chalk.redBright("   Available filters:"));
     console.log(

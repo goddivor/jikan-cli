@@ -13,6 +13,7 @@ export interface ParsedArgs {
   status?: string;
   orderBy?: string;
   sortOrder?: string;
+  interactive: boolean;
 }
 
 export class ArgsParser {
@@ -38,6 +39,7 @@ export class ArgsParser {
     const sortOrderIndex = args.findIndex((arg) => arg === "--order" || arg === "--sort-order");
 
     const detailsFlag = args.includes("-d") || args.includes("--details");
+    const interactive = args.includes("--interactive");
 
     const query = searchIndex !== -1 ? args[searchIndex + 1] : undefined;
     const limit =
@@ -76,6 +78,7 @@ export class ArgsParser {
       status,
       orderBy,
       sortOrder,
+      interactive,
     };
   }
 }

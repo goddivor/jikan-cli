@@ -9,13 +9,22 @@
     "build": "tsc",
     "start": "ts-node src/index.ts"
   },
-  "keywords": ["anime", "cli", "jikan", "myanimelist", "search", "typescript"],
+  "keywords": [
+    "anime",
+    "cli",
+    "jikan",
+    "myanimelist",
+    "search",
+    "typescript"
+  ],
   "author": "goddivor",
   "license": "MIT",
   "description": "A fast and simple CLI application to search for anime using the Jikan API",
   "dependencies": {
+    "@types/inquirer": "^9.0.9",
     "@types/node": "^24.0.10",
     "chalk": "^4.1.2",
+    "inquirer": "^12.9.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

@@ -11,6 +11,11 @@
 - **Seasonal Anime** (`-ss` or `--season`)
 - **Random Anime** (`-r` or `--random`)
 - **Anime Details** by ID (`-i` or `--id`)
+- **🎮 Interactive Mode** (`--interactive`):
+  - Select anime from a navigable list
+  - View details without typing IDs
+  - Navigate with arrow keys
+  - User-friendly menu system
 - **Advanced Filtering**:
   - Type: TV, Movie, OVA, Special, ONA, Music
   - Status: Airing, Completed, Upcoming
@@ -71,6 +76,19 @@ jikan-cli -s "attack on titan" -l 3 --details
 jikan-cli -s "dragon ball" --type movie --sort score --order desc
 ```
 
+### Interactive Mode (Recommended!)
+
+```bash
+# Interactive search - select anime from a list
+jikan-cli -s "naruto" --interactive
+
+# Interactive top anime with navigation
+jikan-cli -t 10 --interactive
+
+# Interactive seasonal anime
+jikan-cli -ss 2023 fall --interactive
+```
+
 ### Top Anime
 
 ```bash
@@ -109,6 +127,7 @@ jikan-cli -i 1735
 ### Options
 - `-l`, `--limit` : Number of results to display (default: 5)
 - `-d`, `--details` : Show detailed information including synopsis
+- `--interactive` : Enable interactive mode with selectable anime list
 
 ### Filters
 - `--type` : Filter by type (tv, movie, ova, special, ona, music)
@@ -122,6 +141,23 @@ jikan-cli -i 1735
 
 ## 📸 Example Output
 
+### Interactive Mode
+```
+🎮 Interactive Mode Enabled
+
+Search: "naruto" | Found: 3 results
+Use ↑↓ arrows to navigate, Enter to select
+
+? 📋 Select an anime to view details: (Use arrow keys)
+❯ 1. Naruto (2002) - ⭐ 8.01 📺 220ep
+  2. Road of Naruto (Unknown year) - ⭐ 8.39 📺 1ep
+  3. Naruto Soyokazeden Movie (Unknown year) - ⭐ 6.95 📺 1ep
+  ───────────────────────────
+  🔙 Go back
+  ❌ Exit
+```
+
+### Standard Mode
 ```
 🔍 Search results for "jujutsu kaisen" (3 max) - Filters: sort=score, order=desc:
 
@@ -153,7 +189,8 @@ jikan-cli/
 │   │   └── anime.ts
 │   ├── utils/             # Utility functions
 │   │   ├── args-parser.ts
-│   │   └── display.ts
+│   │   ├── display.ts
+│   │   └── interactive.ts # Interactive mode utilities
 │   └── index.ts           # Main CLI entry point
 ├── dist/                  # Compiled JavaScript files
 ├── package.json           # Dependencies & CLI metadata
@@ -169,6 +206,7 @@ jikan-cli/
 - [Node.js](https://nodejs.org/) - JavaScript runtime
 - [Jikan API](https://jikan.moe) - Unofficial MyAnimeList API
 - [chalk](https://www.npmjs.com/package/chalk) - Terminal styling
+- [inquirer](https://www.npmjs.com/package/inquirer) - Interactive CLI prompts
 
 ---
 
