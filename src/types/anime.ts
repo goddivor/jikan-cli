@@ -35,6 +35,46 @@ export interface AnimeData {
   }>;
 }
 
+export interface MangaData {
+  title: string;
+  year?: number;
+  score?: number;
+  chapters?: number;
+  volumes?: number;
+  url: string;
+  mal_id?: number;
+  images?: {
+    jpg?: {
+      image_url?: string;
+    };
+  };
+  synopsis?: string;
+  type?: string;
+  status?: string;
+  published?: {
+    string?: string;
+    from?: string;
+    to?: string;
+  };
+  genres?: Array<{
+    mal_id: number;
+    name: string;
+    type: string;
+  }>;
+  themes?: Array<{
+    mal_id: number;
+    name: string;
+    type: string;
+  }>;
+  demographics?: Array<{
+    mal_id: number;
+    name: string;
+    type: string;
+  }>;
+}
+
+export type MediaData = AnimeData | MangaData;
+
 export interface AdvancedSearchOptions {
   genres?: string[];
   excludeGenres?: string[];
@@ -58,4 +98,12 @@ export interface JikanResponse {
 
 export interface JikanSingleResponse {
   data: AnimeData;
+}
+
+export interface JikanMangaResponse {
+  data: MangaData[];
+}
+
+export interface JikanSingleMangaResponse {
+  data: MangaData;
 }

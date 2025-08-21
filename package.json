@@ -11,6 +11,7 @@
   },
   "keywords": [
     "anime",
+    "manga",
     "cli",
     "jikan",
     "jikan-api",
@@ -20,16 +21,18 @@
     "nodejs",
     "interactive-cli",
     "anime-search",
+    "manga-search",
     "mal",
     "terminal",
     "command-line",
     "api-client",
     "seasonal-anime",
-    "anime-database"
+    "anime-database",
+    "manga-database"
   ],
   "author": "goddivor",
   "license": "MIT",
-  "description": "🎌 Interactive TypeScript CLI for searching anime, viewing seasonal releases, and exploring top-rated series using the Jikan API (MyAnimeList)",
+  "description": "🎌 Interactive TypeScript CLI for searching anime & manga, viewing seasonal releases, and exploring top-rated series using the Jikan API (MyAnimeList)",
   "dependencies": {
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.0.10",

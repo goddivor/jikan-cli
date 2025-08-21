@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { AnimeData, AdvancedSearchOptions } from "../types/anime";
+import { AnimeData, MangaData, AdvancedSearchOptions } from "../types/anime";
 
 export class DisplayUtils {
   static displayAnime(
@@ -98,9 +98,10 @@ export class DisplayUtils {
   static displayTopHeader(
     limit: number,
     orderBy?: string,
-    sortOrder?: string
+    sortOrder?: string,
+    mediaType: string = "anime"
   ): void {
-    let headerText = `🏆 Top ${limit} anime`;
+    let headerText = `🏆 Top ${limit} ${mediaType}`;
 
     if (orderBy || sortOrder) {
       const sortInfo = [];
@@ -130,8 +131,81 @@ export class DisplayUtils {
     console.log(chalk.cyanBright(`${headerText}:\n`));
   }
 
-  static displayRandomHeader(): void {
-    console.log(chalk.cyanBright(`🎲 Random anime:\n`));
+  static displayManga(
+    manga: MangaData,
+    index: number,
+    showDetails: boolean
+  ): void {
+    console.log(
+      chalk.green(
+        `${index + 1}. ${chalk.bold(manga.title)} (${
+          manga.year || "Unknown year"
+        })`
+      )
+    );
+    console.log(
+      `   ${chalk.magentaBright("Score")}: ${
+        manga.score ?? "N/A"
+      } | ${chalk.magentaBright("Chapters")}: ${manga.chapters ?? "N/A"} | ${chalk.magentaBright("Volumes")}: ${manga.volumes ?? "N/A"}`
+    );
+    console.log(`   ${chalk.blueBright(manga.url)}`);
+    console.log(
+      `   🖼️ Image: ${chalk.gray(
+        manga.images?.jpg?.image_url || "Not available"
+      )}`
+    );
+
+    if (showDetails) {
+      console.log(
+        `   📝 ${chalk.yellowBright("Synopsis")}: ${
+          manga.synopsis ?? "Not available"
+        }`
+      );
+    }
+
+    console.log(chalk.gray("---"));
+  }
+
+  static displayMangaDetails(manga: MangaData): void {
+    console.log(
+      chalk.cyanBright(`📋 Manga details: ${chalk.bold(manga.title)}\n`)
+    );
+    console.log(
+      `${chalk.magentaBright("Synopsis")}: ${
+        manga.synopsis ?? "Not available"
+      }`
+    );
+    console.log(`${chalk.magentaBright("Type")}: ${manga.type ?? "N/A"}`);
+    console.log(
+      `${chalk.magentaBright("Chapters")}: ${manga.chapters ?? "N/A"}`
+    );
+    console.log(
+      `${chalk.magentaBright("Volumes")}: ${manga.volumes ?? "N/A"}`
+    );
+    console.log(`${chalk.magentaBright("Score")}: ${manga.score ?? "N/A"}`);
+    console.log(`${chalk.magentaBright("Status")}: ${manga.status ?? "N/A"}`);
+    console.log(
+      `${chalk.magentaBright("Published")}: ${
+        manga.published?.string ?? "N/A"
+      }`
+    );
+    console.log(
+      `${chalk.magentaBright("Genres")}: ${
+        manga.genres?.map((g) => g.name).join(", ") ?? "N/A"
+      }`
+    );
+    console.log(
+      `${chalk.magentaBright("Website")}: ${chalk.blueBright(manga.url)}`
+    );
+    console.log(
+      `🖼️ Image: ${chalk.gray(
+        manga.images?.jpg?.image_url || "Not available"
+      )}`
+    );
+  }
+
+  static displayRandomHeader(mediaType: string = "anime"): void {
+    console.log(chalk.cyanBright(`🎲 Random ${mediaType}:\n`));
   }
 
   static displayError(message: string, error?: any): void {
@@ -149,11 +223,12 @@ export class DisplayUtils {
     type?: string,
     status?: string,
     orderBy?: string,
-    sortOrder?: string
+    sortOrder?: string,
+    mediaType: string = "anime"
   ): void {
     let headerText = query 
-      ? `🔍 Advanced search for "${chalk.bold(query)}" (${limit} max)`
-      : `🔍 Advanced search (${limit} max)`;
+      ? `🔍 Advanced ${mediaType} search for "${chalk.bold(query)}" (${limit} max)`
+      : `🔍 Advanced ${mediaType} search (${limit} max)`;
 
     const filters = [];
     if (type) filters.push(`type=${type}`);

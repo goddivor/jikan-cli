@@ -2,6 +2,7 @@ export interface ParsedArgs {
   query?: string;
   limit: number;
   animeId?: string;
+  mangaId?: string;
   topLimit: number;
   detailsFlag: boolean;
   showTop: boolean;
@@ -14,6 +15,7 @@ export interface ParsedArgs {
   orderBy?: string;
   sortOrder?: string;
   interactive: boolean;
+  mediaType: "anime" | "manga";
   // Advanced search options
   genres?: string[];
   excludeGenres?: string[];
@@ -36,6 +38,7 @@ export class ArgsParser {
       (arg) => arg === "-l" || arg === "--limit"
     );
     const idIndex = args.findIndex((arg) => arg === "-i" || arg === "--id");
+    const mangaIdIndex = args.findIndex((arg) => arg === "-mi" || arg === "--manga-id");
     const topIndex = args.findIndex((arg) => arg === "-t" || arg === "--top");
     const seasonIndex = args.findIndex(
       (arg) => arg === "-ss" || arg === "--season"
@@ -59,6 +62,7 @@ export class ArgsParser {
     const maxScoreIndex = args.findIndex((arg) => arg === "--max-score");
     const fuzzyThresholdIndex = args.findIndex((arg) => arg === "--fuzzy-threshold");
     const genreSearchIndex = args.findIndex((arg) => arg === "--genre-search" || arg === "-gs");
+    const mediaTypeIndex = args.findIndex((arg) => arg === "--media" || arg === "-m");
 
     // Flags
     const detailsFlag = args.includes("-d") || args.includes("--details");
@@ -73,6 +77,8 @@ export class ArgsParser {
         ? parseInt(args[limitIndex + 1])
         : 5;
     const animeId = idIndex !== -1 ? args[idIndex + 1] : undefined;
+    const mangaId = mangaIdIndex !== -1 ? args[mangaIdIndex + 1] : undefined;
+    const mediaType = mediaTypeIndex !== -1 && args[mediaTypeIndex + 1] === "manga" ? "manga" : "anime";
     const topLimit =
       topIndex !== -1 &&
       args[topIndex + 1] &&
@@ -133,6 +139,7 @@ export class ArgsParser {
       query,
       limit,
       animeId,
+      mangaId,
       topLimit,
       detailsFlag,
       showTop,
@@ -145,6 +152,7 @@ export class ArgsParser {
       orderBy,
       sortOrder,
       interactive,
+      mediaType,
       genres,
       excludeGenres,
       year,
@@ -160,17 +168,21 @@ export class ArgsParser {
 
   static showHelp(): void {
     const helpText = `
-🎌 Jikan CLI - Advanced Anime Search Tool
+🎌 Jikan CLI - Advanced Anime & Manga Search Tool
 
 USAGE:
   jikan-cli [COMMAND] [OPTIONS]
 
+MEDIA TYPE:
+  -m, --media <type>            Specify media type: anime (default) or manga
+
 BASIC COMMANDS:
-  -s, --search <query>          Search anime by name
-  -t, --top [limit]             Show top anime (default: 10)
-  -ss, --season <year> <season> Show seasonal anime
-  -r, --random                  Show random anime
+  -s, --search <query>          Search by name
+  -t, --top [limit]             Show top entries (default: 10)
+  -ss, --season <year> <season> Show seasonal anime (anime only)
+  -r, --random                  Show random entry
   -i, --id <id>                 Show anime details by ID
+  -mi, --manga-id <id>          Show manga details by ID
   --list-genres                 Show all available genres
 
 BASIC OPTIONS:
@@ -179,9 +191,12 @@ BASIC OPTIONS:
   --interactive                 Interactive mode with selection menu
 
 FILTERS:
-  --type <type>                 Filter by type (tv, movie, ova, special, ona, music)
-  --status <status>             Filter by status (airing, completed, upcoming)
+  --type <type>                 Filter by type
+                                Anime: tv, movie, ova, special, ona, music
+                                Manga: manga, novel, lightnovel, oneshot, doujin, manhwa, manhua
+  --status <status>             Filter by status (airing/publishing, completed, upcoming)
   --sort <criteria>             Sort by (score, members, start_date, title, rank, popularity)
+                                Manga also supports: chapters, volumes
   --order <order>               Sort order (asc, desc - default: desc)
 
 ADVANCED SEARCH:
@@ -196,19 +211,22 @@ ADVANCED SEARCH:
   --fuzzy-threshold <number>    Fuzzy search threshold (0.0-1.0, default: 0.4)
 
 EXAMPLES:
-  Basic search:
+  Basic anime search:
     jikan-cli -s "naruto"
     jikan-cli -s "attack on titan" -l 3 --details
 
+  Basic manga search:
+    jikan-cli --media manga -s "one piece"
+    jikan-cli --media manga -t 10 --interactive
+
   Advanced filtering:
     jikan-cli -s "dragon" --genres "action,fantasy" --min-score 8.0
-    jikan-cli --genre-search "romance,comedy" --year-range 2020-2023
+    jikan-cli --media manga --genre-search "romance,comedy" --year-range 2020-2023
     jikan-cli -s "narto" --fuzzy --fuzzy-threshold 0.6
-    jikan-cli -t 10 --exclude-genres "ecchi,harem" --type tv
 
   Interactive mode:
     jikan-cli -s "naruto" --interactive
-    jikan-cli --genre-search "action" --interactive
+    jikan-cli --media manga --genre-search "action" --interactive
 `;
     console.log(helpText);
   }

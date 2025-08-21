@@ -1,5 +1,5 @@
 import Fuse from 'fuse.js';
-import { AnimeData, AdvancedSearchOptions, GenreInfo } from '../types/anime';
+import { AnimeData, MangaData, AdvancedSearchOptions, GenreInfo } from '../types/anime';
 
 export class AdvancedSearchUtils {
   // Common anime genres for validation and suggestion
@@ -200,6 +200,91 @@ export class AdvancedSearchUtils {
   }
 
   /**
+   * Filter manga by advanced search criteria
+   */
+  static filterManga(mangaList: MangaData[], options: AdvancedSearchOptions): MangaData[] {
+    return mangaList.filter(manga => {
+      // Genre filtering
+      if (options.genres && options.genres.length > 0) {
+        const mangaGenres = manga.genres?.map(g => g.name.toLowerCase()) || [];
+        const hasRequiredGenre = options.genres.some(genre => 
+          mangaGenres.includes(genre.toLowerCase())
+        );
+        if (!hasRequiredGenre) return false;
+      }
+
+      // Genre exclusion
+      if (options.excludeGenres && options.excludeGenres.length > 0) {
+        const mangaGenres = manga.genres?.map(g => g.name.toLowerCase()) || [];
+        const hasExcludedGenre = options.excludeGenres.some(genre => 
+          mangaGenres.includes(genre.toLowerCase())
+        );
+        if (hasExcludedGenre) return false;
+      }
+
+      // Year filtering
+      if (options.year && manga.year && manga.year !== options.year) {
+        return false;
+      }
+
+      // Year range filtering
+      if (options.yearRange && manga.year) {
+        if (manga.year < options.yearRange.start || manga.year > options.yearRange.end) {
+          return false;
+        }
+      }
+
+      // Score filtering
+      if (options.minScore && manga.score && manga.score < options.minScore) {
+        return false;
+      }
+
+      if (options.maxScore && manga.score && manga.score > options.maxScore) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  /**
+   * Sort manga results by custom criteria
+   */
+  static sortManga(mangaList: MangaData[], sortBy: string, order: 'asc' | 'desc' = 'desc'): MangaData[] {
+    const sortedList = [...mangaList].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy.toLowerCase()) {
+        case 'score':
+          comparison = (a.score || 0) - (b.score || 0);
+          break;
+        case 'year':
+          comparison = (a.year || 0) - (b.year || 0);
+          break;
+        case 'chapters':
+          comparison = (a.chapters || 0) - (b.chapters || 0);
+          break;
+        case 'volumes':
+          comparison = (a.volumes || 0) - (b.volumes || 0);
+          break;
+        case 'title':
+        case 'name':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'popularity':
+          comparison = (b.mal_id || 0) - (a.mal_id || 0);
+          break;
+        default:
+          comparison = (a.score || 0) - (b.score || 0);
+      }
+
+      return order === 'desc' ? -comparison : comparison;
+    });
+
+    return sortedList;
+  }
+
+  /**
    * Extract year from aired date string
    */
   static extractYearFromAired(anime: AnimeData): number | undefined {
@@ -212,6 +297,25 @@ export class AdvancedSearchUtils {
 
     if (anime.aired?.string) {
       const yearMatch = anime.aired.string.match(/\b(19|20)\d{2}\b/);
+      return yearMatch ? parseInt(yearMatch[0]) : undefined;
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Extract year from published date string for manga
+   */
+  static extractYearFromPublished(manga: MangaData): number | undefined {
+    if (manga.year) return manga.year;
+    
+    if (manga.published?.from) {
+      const year = new Date(manga.published.from).getFullYear();
+      return isNaN(year) ? undefined : year;
+    }
+
+    if (manga.published?.string) {
+      const yearMatch = manga.published.string.match(/\b(19|20)\d{2}\b/);
       return yearMatch ? parseInt(yearMatch[0]) : undefined;
     }
 

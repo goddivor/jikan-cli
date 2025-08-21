@@ -2,6 +2,7 @@
 
 import { ArgsParser } from "./utils/args-parser";
 import { AnimeCommands } from "./commands/anime-commands";
+import { MangaCommands } from "./commands/manga-commands";
 import { DisplayUtils } from "./utils/display";
 import { AdvancedSearchOptions } from "./types/anime";
 
@@ -17,7 +18,11 @@ async function main(): Promise<void> {
 
   // Handle genres list command
   if (parsedArgs.showGenres) {
-    AnimeCommands.showAllGenres();
+    if (parsedArgs.mediaType === "manga") {
+      MangaCommands.showAllGenres();
+    } else {
+      AnimeCommands.showAllGenres();
+    }
     return;
   }
 
@@ -36,9 +41,19 @@ async function main(): Promise<void> {
   // Main command routing
   if (parsedArgs.animeId) {
     await AnimeCommands.getAnimeDetails(parsedArgs.animeId);
+  } else if (parsedArgs.mangaId) {
+    await MangaCommands.getMangaDetails(parsedArgs.mangaId);
   } else if (parsedArgs.showTop) {
-    await AnimeCommands.showTopAnimes(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
+    if (parsedArgs.mediaType === "manga") {
+      await MangaCommands.showTopMangas(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
+    } else {
+      await AnimeCommands.showTopAnimes(parsedArgs.topLimit, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
+    }
   } else if (parsedArgs.showSeason) {
+    if (parsedArgs.mediaType === "manga") {
+      DisplayUtils.displayError("Seasonal search is only available for anime");
+      process.exit(1);
+    }
     if (!parsedArgs.seasonYear || !parsedArgs.seasonName) {
       DisplayUtils.displayError("Year and season required for --season");
       DisplayUtils.displayUsage();
@@ -46,32 +61,63 @@ async function main(): Promise<void> {
     }
     await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
   } else if (parsedArgs.showRandom) {
-    await AnimeCommands.showRandomAnime();
+    if (parsedArgs.mediaType === "manga") {
+      await MangaCommands.showRandomManga();
+    } else {
+      await AnimeCommands.showRandomAnime();
+    }
   } else if (parsedArgs.genreSearch && parsedArgs.genres) {
     // Genre-only search
-    await AnimeCommands.searchAnimeByGenres(
-      parsedArgs.genres,
-      parsedArgs.limit,
-      parsedArgs.detailsFlag,
-      parsedArgs.excludeGenres,
-      parsedArgs.orderBy,
-      parsedArgs.sortOrder,
-      parsedArgs.interactive,
-      advancedOptions
-    );
+    if (parsedArgs.mediaType === "manga") {
+      await MangaCommands.searchMangaByGenres(
+        parsedArgs.genres,
+        parsedArgs.limit,
+        parsedArgs.detailsFlag,
+        parsedArgs.excludeGenres,
+        parsedArgs.orderBy,
+        parsedArgs.sortOrder,
+        parsedArgs.interactive,
+        advancedOptions
+      );
+    } else {
+      await AnimeCommands.searchAnimeByGenres(
+        parsedArgs.genres,
+        parsedArgs.limit,
+        parsedArgs.detailsFlag,
+        parsedArgs.excludeGenres,
+        parsedArgs.orderBy,
+        parsedArgs.sortOrder,
+        parsedArgs.interactive,
+        advancedOptions
+      );
+    }
   } else if (parsedArgs.query) {
     // Regular search with advanced options
-    await AnimeCommands.searchAnime(
-      parsedArgs.query,
-      parsedArgs.limit,
-      parsedArgs.detailsFlag,
-      parsedArgs.type,
-      parsedArgs.status,
-      parsedArgs.orderBy,
-      parsedArgs.sortOrder,
-      parsedArgs.interactive,
-      advancedOptions
-    );
+    if (parsedArgs.mediaType === "manga") {
+      await MangaCommands.searchManga(
+        parsedArgs.query,
+        parsedArgs.limit,
+        parsedArgs.detailsFlag,
+        parsedArgs.type,
+        parsedArgs.status,
+        parsedArgs.orderBy,
+        parsedArgs.sortOrder,
+        parsedArgs.interactive,
+        advancedOptions
+      );
+    } else {
+      await AnimeCommands.searchAnime(
+        parsedArgs.query,
+        parsedArgs.limit,
+        parsedArgs.detailsFlag,
+        parsedArgs.type,
+        parsedArgs.status,
+        parsedArgs.orderBy,
+        parsedArgs.sortOrder,
+        parsedArgs.interactive,
+        advancedOptions
+      );
+    }
   } else {
     DisplayUtils.displayUsage();
     process.exit(1);
