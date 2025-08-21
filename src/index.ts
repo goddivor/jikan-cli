@@ -3,11 +3,37 @@
 import { ArgsParser } from "./utils/args-parser";
 import { AnimeCommands } from "./commands/anime-commands";
 import { DisplayUtils } from "./utils/display";
+import { AdvancedSearchOptions } from "./types/anime";
 
 const args = process.argv.slice(2);
 const parsedArgs = ArgsParser.parse(args);
 
 async function main(): Promise<void> {
+  // Handle help command
+  if (args.includes('--help') || args.includes('-h')) {
+    ArgsParser.showHelp();
+    return;
+  }
+
+  // Handle genres list command
+  if (parsedArgs.showGenres) {
+    AnimeCommands.showAllGenres();
+    return;
+  }
+
+  // Build advanced search options
+  const advancedOptions: AdvancedSearchOptions = {
+    genres: parsedArgs.genres,
+    excludeGenres: parsedArgs.excludeGenres,
+    year: parsedArgs.year,
+    yearRange: parsedArgs.yearRange,
+    minScore: parsedArgs.minScore,
+    maxScore: parsedArgs.maxScore,
+    fuzzySearch: parsedArgs.fuzzySearch,
+    fuzzyThreshold: parsedArgs.fuzzyThreshold,
+  };
+
+  // Main command routing
   if (parsedArgs.animeId) {
     await AnimeCommands.getAnimeDetails(parsedArgs.animeId);
   } else if (parsedArgs.showTop) {
@@ -21,7 +47,20 @@ async function main(): Promise<void> {
     await AnimeCommands.showSeasonAnimes(parsedArgs.seasonYear, parsedArgs.seasonName, parsedArgs.orderBy, parsedArgs.sortOrder, parsedArgs.interactive);
   } else if (parsedArgs.showRandom) {
     await AnimeCommands.showRandomAnime();
+  } else if (parsedArgs.genreSearch && parsedArgs.genres) {
+    // Genre-only search
+    await AnimeCommands.searchAnimeByGenres(
+      parsedArgs.genres,
+      parsedArgs.limit,
+      parsedArgs.detailsFlag,
+      parsedArgs.excludeGenres,
+      parsedArgs.orderBy,
+      parsedArgs.sortOrder,
+      parsedArgs.interactive,
+      advancedOptions
+    );
   } else if (parsedArgs.query) {
+    // Regular search with advanced options
     await AnimeCommands.searchAnime(
       parsedArgs.query,
       parsedArgs.limit,
@@ -30,7 +69,8 @@ async function main(): Promise<void> {
       parsedArgs.status,
       parsedArgs.orderBy,
       parsedArgs.sortOrder,
-      parsedArgs.interactive
+      parsedArgs.interactive,
+      advancedOptions
     );
   } else {
     DisplayUtils.displayUsage();

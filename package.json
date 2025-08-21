@@ -34,6 +34,7 @@
     "@types/inquirer": "^9.0.9",
     "@types/node": "^24.0.10",
     "chalk": "^4.1.2",
+    "fuse.js": "^7.1.0",
     "inquirer": "^12.9.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

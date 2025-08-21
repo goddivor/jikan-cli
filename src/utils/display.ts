@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { AnimeData } from "../types/anime";
+import { AnimeData, AdvancedSearchOptions } from "../types/anime";
 
 export class DisplayUtils {
   static displayAnime(
@@ -142,29 +142,74 @@ export class DisplayUtils {
     console.log(chalk.yellowBright("😢 No results found."));
   }
 
+  static displayAdvancedSearchHeader(
+    query: string | undefined,
+    limit: number,
+    advancedOptions?: AdvancedSearchOptions,
+    type?: string,
+    status?: string,
+    orderBy?: string,
+    sortOrder?: string
+  ): void {
+    let headerText = query 
+      ? `🔍 Advanced search for "${chalk.bold(query)}" (${limit} max)`
+      : `🔍 Advanced search (${limit} max)`;
+
+    const filters = [];
+    if (type) filters.push(`type=${type}`);
+    if (status) filters.push(`status=${status}`);
+    if (orderBy) filters.push(`sort=${orderBy}`);
+    if (sortOrder) filters.push(`order=${sortOrder}`);
+
+    if (advancedOptions) {
+      if (advancedOptions.genres?.length) {
+        filters.push(`genres=${advancedOptions.genres.join(',')}`);
+      }
+      if (advancedOptions.excludeGenres?.length) {
+        filters.push(`exclude=${advancedOptions.excludeGenres.join(',')}`);
+      }
+      if (advancedOptions.year) {
+        filters.push(`year=${advancedOptions.year}`);
+      }
+      if (advancedOptions.yearRange) {
+        filters.push(`years=${advancedOptions.yearRange.start}-${advancedOptions.yearRange.end}`);
+      }
+      if (advancedOptions.minScore !== undefined) {
+        filters.push(`min-score=${advancedOptions.minScore}`);
+      }
+      if (advancedOptions.maxScore !== undefined) {
+        filters.push(`max-score=${advancedOptions.maxScore}`);
+      }
+      if (advancedOptions.fuzzySearch) {
+        filters.push(`fuzzy=${advancedOptions.fuzzyThreshold || 0.4}`);
+      }
+    }
+
+    if (filters.length > 0) {
+      headerText += ` - Filters: ${filters.join(", ")}`;
+    }
+
+    console.log(chalk.cyanBright(`${headerText}:\n`));
+  }
+
   static displayUsage(): void {
+    console.log(chalk.cyan("🎌 Jikan CLI - For detailed help, use: --help"));
+    console.log(chalk.redBright(""));
     console.log(
       chalk.redBright(
-        '❌ Usage: jikan-cli -s "anime name" [-l limit] [--details] [--interactive] [--type type] [--status status] [--sort criteria] [--order asc/desc]'
+        '❌ Usage: jikan-cli -s "anime name" [-l limit] [--details] [--interactive]'
       )
     );
+    console.log(chalk.redBright("   or: jikan-cli --genre-search \"action,fantasy\""));
     console.log(chalk.redBright("   or: jikan-cli -i/--id anime_id"));
-    console.log(chalk.redBright("   or: jikan-cli -t/--top [n] [--interactive] [--sort criteria] [--order asc/desc]"));
-    console.log(chalk.redBright("   or: jikan-cli -ss/--season year season [--interactive] [--sort criteria] [--order asc/desc]"));
+    console.log(chalk.redBright("   or: jikan-cli -t/--top [n] [--interactive]"));
+    console.log(chalk.redBright("   or: jikan-cli -ss/--season year season"));
     console.log(chalk.redBright("   or: jikan-cli -r/--random"));
+    console.log(chalk.redBright("   or: jikan-cli --list-genres"));
     console.log(chalk.redBright(""));
-    console.log(chalk.redBright("   Options:"));
-    console.log(chalk.redBright("   -d, --details: Show detailed information including synopsis"));
-    console.log(chalk.redBright("   --interactive: Enable interactive mode with selectable list"));
-    console.log(chalk.redBright(""));
-    console.log(chalk.redBright("   Available filters:"));
-    console.log(
-      chalk.redBright("   --type: tv, movie, ova, special, ona, music")
-    );
-    console.log(chalk.redBright("   --status: airing, completed, upcoming"));
-    console.log(chalk.redBright(""));
-    console.log(chalk.redBright("   Available sorting options:"));
-    console.log(chalk.redBright("   --sort: score, members, start_date, title, rank, popularity"));
-    console.log(chalk.redBright("   --order: asc (ascending), desc (descending, default)"));
+    console.log(chalk.yellow("💡 Examples:"));
+    console.log(chalk.cyan('  jikan-cli -s "naruto" --fuzzy --genres "action"'));
+    console.log(chalk.cyan('  jikan-cli --genre-search "romance,comedy" --min-score 8.0'));
+    console.log(chalk.cyan('  jikan-cli -s "dragon" --year-range 2010-2020 --exclude-genres "ecchi"'));
   }
 }
