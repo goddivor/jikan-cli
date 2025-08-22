@@ -129,22 +129,57 @@ jikan-cli --organize "./Downloads" --target "./Anime Library"
 
 ### Supported File Patterns
 
-**Voiranime Format:**
+**🇫🇷 French Platforms:**
+
+*Voiranime:*
 ```
-Naruto- Shippuuden (VF) - Naruto Shippuden - 052 VF - 052 - Voiranime.mp4
-→ Naruto Shippuden/Season 1/Naruto Shippuden - S01E52 [VF].mp4
+Kamitsubaki City Under Construction - Kamitsubaki City Under Construction - 03 VOSTFR - 03 - Voiranime.mp4
+→ Kamitsubaki City Under Construction/Season 1/Kamitsubaki City Under Construction - S01E03 [VOSTFR].mp4
 ```
 
-**Abbreviated Format:**
+*Anime-Sama:*
 ```
-SNK_S3_17_VF.mp4
-→ Attack on Titan/Season 3/Attack on Titan - S03E17 [VF].mp4
+A Couple of Cuckoos - Saison 2 - Anime-Sama - Streaming et catalogage d'animes et scans..ts
+→ A Couple of Cuckoos/Season 2/A Couple of Cuckoos - S02E01.ts
 ```
 
-**Simple Format:**
+*ADKami:*
 ```
-Naruto.mp4
-→ Naruto/Naruto.mp4
+Kimi to Idol Precure♪ - Episode 28 vostfr - ADKami.mp4
+→ Kimi to Idol Precure♪/Season 1/Kimi to Idol Precure♪ - S01E28 [VOSTFR].mp4
+```
+
+*FRAnime:*
+```
+Mushishi Special - Hihamukage S1 EP1 VOSTFR - FRAnime.fr #1 DE L'ANIME SANS PUB ET GRATUIT.mp4
+→ Mushishi Special - Hihamukage/Season 1/Mushishi Special - Hihamukage - S01E01 [VOSTFR].mp4
+```
+
+**🌍 International Platforms:**
+
+*HiAnime:*
+```
+Watch Kamitsubaki City Under Construction English Sub-Dub online Free on HiAnime.to.ts
+→ Kamitsubaki City Under Construction/Season 1/Kamitsubaki City Under Construction - S01E01.ts
+```
+
+*Nyaa Torrents:*
+```
+[shincaps] Black Clover - 129 (ANIMAX Asia 1920x1080 H264 MP2).ts
+→ Black Clover/Season 1/Black Clover - S01E129.ts
+
+[Tsundere-Raws] Black Clover - 169 VOSTFR [CR 720p].mkv
+→ Black Clover/Season 1/Black Clover - S01E169 [VOSTFR].mkv
+
+Black.Clover.S01.MULTi.1080p.BDRiP.x265-KAF
+→ Black Clover/Season 1/ (season pack)
+```
+
+**📱 Simplified Formats:**
+```
+NarutoE01.mp4 → Naruto/Season 1/Naruto - S01E01.mp4
+Shingeki no Kyojin 3E17 [VF].mp4 → Shingeki no Kyojin/Season 3/Shingeki no Kyojin - S03E17 [VF].mp4
+I Left My AE09.mp4 → I Left My A/Season 1/I Left My A - S01E09.mp4
 ```
 
 ### Generated Structure
@@ -193,10 +228,12 @@ jikan-cli --organize "./Downloads" --handle-duplicates rename
 ### What Gets Filtered Out
 
 The tool automatically ignores non-anime files:
-- **Music**: `lukrembo - butter (royalty free vlog music).mp4`
+- **Music**: `lukrembo - butter (royalty free vlog music).mp4`, `RYLLZ - Nemesis.mp4`
 - **Tutorials**: `Dual Boot Bliss OS and Windows Without USB Drive.mp4`
-- **Short clips**: Files with `#anime #edit #shorts` patterns
-- **Other content**: Unrecognized or very low confidence files
+- **Short clips**: `Anime Rage Moment??_#anime #animeedit #animeshorts.mp4`
+- **Social content**: `Black Lagoon - Balalaika Edit 🔥.mp4`
+- **Design files**: `Web Reservation UI by Muhammad Salim for Fixoria Studio on Dribbble.mp4`
+- **Other content**: Files with very low confidence scores
 
 ### Safety Features
 
@@ -556,6 +593,46 @@ jikan-cli/
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+### 🎯 **Priority: Improve File Organization Pattern Recognition**
+
+**The auto-organization feature needs YOUR help to become more accurate!** 
+
+We currently support patterns from major platforms, but anime downloads come in countless filename formats from different sites, regions, and uploaders. To make this feature more comprehensive and precise for all users worldwide, we need more examples.
+
+**🙏 How You Can Help:**
+
+1. **🐛 Open an Issue** if you encounter unrecognized anime files
+2. **📝 Provide Pattern Examples** - Include:
+   - **Platform name** (e.g., "9anime", "Gogoanime", "Crunchyroll", etc.)
+   - **Sample filenames** (at least 3-5 examples from the same source)
+   - **Expected parsing** (anime name, season, episode, language)
+
+**📋 Issue Template Example:**
+```
+**Platform:** Gogoanime
+**Filename Examples:**
+- Demon Slayer S1 Episode 01 English Dubbed.mp4
+- Demon Slayer S1 Episode 02 English Dubbed.mp4
+- Demon Slayer S2 Episode 01 English Dubbed.mp4
+
+**Expected Results:**
+- Anime: "Demon Slayer"
+- Season: 1/2
+- Episode: 01/02/01
+- Language: English Dubbed
+```
+
+**🌍 Especially Needed:**
+- **Regional platforms** (non-English anime sites)
+- **Mobile app downloads** (unique naming conventions)
+- **Batch torrent releases** (season packs, complete series)
+- **Streaming site downloaders** (yt-dlp, 4k-downloader, etc.)
+- **Fan encoders** (individual uploaders with custom naming)
+
+The more diverse examples we collect, the better the pattern recognition becomes for everyone! Every contribution helps make this tool more universal and accurate.
+
+### 🔧 General Development
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)

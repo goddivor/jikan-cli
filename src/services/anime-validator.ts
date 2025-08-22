@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { JikanApi } from "./jikan-api";
 import { FileParser } from "../utils/file-parser";
 import { ParsedAnimeFile, AnimeMatch } from "../types/organize";
@@ -7,7 +8,7 @@ export class AnimeValidator {
   private static readonly CACHE = new Map<string, any>();
   private static readonly CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
 
-  static async validateAndEnrichAnimeFile(parsedFile: ParsedAnimeFile): Promise<AnimeMatch> {
+  static async validateAndEnrichAnimeFile(parsedFile: ParsedAnimeFile): Promise<AnimeMatch | null> {
     const variations = FileParser.getAnimeNameVariations(parsedFile.animeName);
     let bestMatch: any = null;
     let bestScore = 0;
@@ -45,16 +46,18 @@ export class AnimeValidator {
       }
     }
 
-    // Créer le résultat final
-    const normalizedName = bestMatch ? 
-      this.normalizeAnimeName(bestMatch) : 
-      this.fallbackNormalizeName(parsedFile.animeName);
+    // If no anime found in API, this is not an anime file
+    if (!bestMatch) {
+      return null; // Not an anime - will be classified as "other"
+    }
 
-    const targetPath = this.generateTargetPath(parsedFile, normalizedName);
+    // Créer le résultat final - API confirmed it's an anime
+    const normalizedName = this.normalizeAnimeName(bestMatch);
+    const targetPath = this.generateTargetPath(parsedFile, normalizedName, bestMatch);
 
     const animeMatch: AnimeMatch = {
       parsedFile,
-      jikanData: bestMatch ? {
+      jikanData: {
         id: bestMatch.mal_id,
         title: bestMatch.title,
         title_english: (bestMatch as any).title_english,
@@ -62,7 +65,7 @@ export class AnimeValidator {
         episodes: bestMatch.episodes,
         season: bestMatch.season,
         year: bestMatch.year
-      } : undefined,
+      },
       normalizedName,
       targetPath
     };
@@ -177,14 +180,21 @@ export class AnimeValidator {
       .trim();
   }
 
-  private static generateTargetPath(parsedFile: ParsedAnimeFile, normalizedName: string): string {
+  private static generateTargetPath(parsedFile: ParsedAnimeFile, normalizedName: string, jikanData?: any): string {
     let path = normalizedName;
 
-    // Add season folder if necessary
-    if (parsedFile.season && parsedFile.season > 1) {
+    // If pattern detected a specific season, use it
+    if (parsedFile.season && parsedFile.season > 0) {
       path += `/Season ${parsedFile.season}`;
-    } else if (parsedFile.season === 1) {
-      path += '/Season 1';
+    } else {
+      // For "Simple Episode" patterns or no season detected:
+      // Check if API indicates multiple seasons exist for this anime
+      if (jikanData && jikanData.season) {
+        // If API knows about seasons but we couldn't parse it from filename,
+        // just put in main folder without season subfolder
+        // User can organize manually later if needed
+      }
+      // No season folder - just put directly in anime folder
     }
 
     return path;
@@ -219,8 +229,9 @@ export class AnimeValidator {
   }
 
   // Validation en lot pour de meilleures performances
-  static async validateBatch(parsedFiles: ParsedAnimeFile[]): Promise<AnimeMatch[]> {
-    const results: AnimeMatch[] = [];
+  static async validateBatch(parsedFiles: ParsedAnimeFile[]): Promise<{ animeMatches: AnimeMatch[], otherFiles: ParsedAnimeFile[] }> {
+    const animeMatches: AnimeMatch[] = [];
+    const otherFiles: ParsedAnimeFile[] = [];
     
     // Traiter par petits groupes pour éviter de surcharger l'API
     const batchSize = 3;
@@ -230,7 +241,16 @@ export class AnimeValidator {
       
       try {
         const batchResults = await Promise.all(batchPromises);
-        results.push(...batchResults);
+        
+        // Separate anime matches from non-anime files
+        for (let j = 0; j < batchResults.length; j++) {
+          const result = batchResults[j];
+          if (result) {
+            animeMatches.push(result);
+          } else {
+            otherFiles.push(batch[j]);
+          }
+        }
       } catch (error) {
         console.warn(`Error during batch processing ${i / batchSize + 1}:`, error);
         
@@ -238,16 +258,14 @@ export class AnimeValidator {
         for (const file of batch) {
           try {
             const result = await this.validateAndEnrichAnimeFile(file);
-            results.push(result);
+            if (result) {
+              animeMatches.push(result);
+            } else {
+              otherFiles.push(file);
+            }
           } catch (individualError) {
             console.warn(`Error for file ${file.fileName}:`, individualError);
-            
-            // Create a fallback result
-            results.push({
-              parsedFile: { ...file, confidence: Math.max(0, file.confidence - 20) },
-              normalizedName: this.fallbackNormalizeName(file.animeName),
-              targetPath: this.generateTargetPath(file, this.fallbackNormalizeName(file.animeName))
-            });
+            otherFiles.push(file); // Treat as non-anime if API fails
           }
         }
       }
@@ -256,7 +274,7 @@ export class AnimeValidator {
       await this.delay(500);
     }
 
-    return results;
+    return { animeMatches, otherFiles };
   }
 
   // Cache statistics for debugging
@@ -270,5 +288,79 @@ export class AnimeValidator {
   // Clear cache manually
   static clearCache(): void {
     this.CACHE.clear();
+  }
+
+  // Recover and group skipped files by anime name similarity
+  static async recoverAndGroupSkippedFiles(
+    skippedFiles: ParsedAnimeFile[], 
+    existingMatches: AnimeMatch[]
+  ): Promise<{ newMatches: AnimeMatch[], stillSkipped: ParsedAnimeFile[] }> {
+    const newMatches: AnimeMatch[] = [];
+    const stillSkipped: ParsedAnimeFile[] = [];
+    
+    // Group skipped files by detected anime name for batch processing
+    const groupedByAnime = new Map<string, ParsedAnimeFile[]>();
+    
+    for (const file of skippedFiles) {
+      const animeName = file.animeName.toLowerCase().trim();
+      if (!groupedByAnime.has(animeName)) {
+        groupedByAnime.set(animeName, []);
+      }
+      groupedByAnime.get(animeName)!.push(file);
+    }
+
+    console.log(chalk.blue('\n🔄 Re-validating selected files with API...'));
+    
+    // Process each anime group
+    for (const [animeName, files] of groupedByAnime.entries()) {
+      console.log(chalk.gray(`   Processing "${animeName}" (${files.length} file(s))`));
+      
+      try {
+        // Try to validate the first file of the group
+        const firstFile = files[0];
+        const result = await this.validateAndEnrichAnimeFile(firstFile);
+        
+        if (result) {
+          // API confirmed it's an anime - add the first file
+          newMatches.push(result);
+          
+          // Check if there are other files in the group
+          if (files.length > 1) {
+            console.log(chalk.green(`   ✅ "${animeName}" confirmed as anime`));
+            console.log(chalk.gray(`      Grouping ${files.length - 1} additional episode(s)...`));
+            
+            // Process remaining files with same anime identity
+            for (let i = 1; i < files.length; i++) {
+              const additionalFile = files[i];
+              
+              // Create match using same anime data but different episode
+              const additionalMatch: AnimeMatch = {
+                parsedFile: additionalFile,
+                jikanData: result.jikanData,
+                normalizedName: result.normalizedName,
+                targetPath: this.generateTargetPath(additionalFile, result.normalizedName, result.jikanData)
+              };
+              
+              // Adjust confidence based on grouping
+              additionalMatch.parsedFile.confidence = Math.max(60, additionalFile.confidence + 15);
+              
+              newMatches.push(additionalMatch);
+            }
+          }
+        } else {
+          // API rejected - add all files to still skipped
+          console.log(chalk.red(`   ❌ "${animeName}" not confirmed as anime`));
+          stillSkipped.push(...files);
+        }
+      } catch (error) {
+        console.warn(`Error processing group "${animeName}":`, error);
+        stillSkipped.push(...files);
+      }
+      
+      // Small delay between groups
+      await this.delay(300);
+    }
+    
+    return { newMatches, stillSkipped };
   }
 }

@@ -62,7 +62,7 @@ export interface AnimePattern {
 
 export interface FileClassification {
   file: string;
-  type: 'anime' | 'music' | 'tutorial' | 'clip' | 'other' | 'unknown';
+  type: 'anime' | 'other';
   confidence: number;
   reason: string;
 }

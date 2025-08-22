@@ -3,37 +3,195 @@ import { ParsedAnimeFile, AnimePattern, FileClassification } from "../types/orga
 
 export class FileParser {
   private static readonly ANIME_PATTERNS: AnimePattern[] = [
-    // Voiranime long pattern: "Naruto- Shippuuden (VF) - Naruto Shippuden - 052 VF - 052 - Voiranime.mp4"
+    // VOIRANIME PATTERNS
+    // Standard Voiranime: "Kamitsubaki City Under Construction - Kamitsubaki City Under Construction - 03 VOSTFR - 03 - Voiranime.mp4"
     {
-      name: "Voiranime Long",
-      regex: /^(.+?)\s*(?:\(([VF|VOSTFR]+)\))?\s*-\s*(.+?)\s*-\s*(\d+)(?:x(\d+))?\s*(?:VF|VOSTFR)\s*-\s*\4\s*-\s*Voiranime/i,
+      name: "Voiranime Standard",
+      regex: /^(.+?)\s*(?:\(([VF|VOSTFR]+)\))?\s*-\s*(.+?)\s*-\s*(\d+)(?:x(\d+))?\s*(VF|VOSTFR)\s*-\s*\4\s*-\s*Voiranime/i,
       extractGroups: {
         animeName: 1,
-        season: 0, // Pas de saison dans ce pattern
+        season: 0,
         episode: 4,
-        language: 2,
+        language: 6,
         platform: 0
       },
       confidence: 95,
-      description: "Format Voiranime complet avec répétition épisode"
+      description: "Standard Voiranime format"
     },
 
-    // Voiranime season pattern: "Shingeki no Kyojin 3 (VF) - Shingeki No Kyojin (Attaque Des Titans) (Saison 3) - 17 VF - 17 - Voiranime.mp4"
+    // Voiranime with season: "Naruto- Shippuuden (VF) - Naruto Shippuden - 129x130 VF - 129x130 - Voiranime.mp4"
     {
       name: "Voiranime Season",
-      regex: /^(.+?)\s+(\d+)\s*(?:\(([VF|VOSTFR]+)\))?\s*-\s*.+?\s*(?:\(Saison\s+\2\))?\s*-\s*(\d+)\s*(?:VF|VOSTFR)\s*-\s*\4\s*-\s*Voiranime/i,
+      regex: /^(.+?)\s+(\d+)\s*(?:\(([VF|VOSTFR]+)\))?\s*-\s*.+?\s*-\s*(\d+)(?:x(\d+))?\s*(VF|VOSTFR)\s*-\s*\4(?:x\5)?\s*-\s*Voiranime/i,
       extractGroups: {
         animeName: 1,
         season: 2,
         episode: 4,
-        language: 3,
+        language: 6,
         platform: 0
       },
       confidence: 95,
-      description: "Format Voiranime avec numéro de saison"
+      description: "Voiranime with season number"
     },
 
-    // Short pattern: "SNK_S1_1_VF.mp4"
+    // ANIME-SAMA PATTERNS
+    // "A Couple of Cuckoos - Saison 2 - Anime-Sama - Streaming et catalogage d'animes et scans..ts"
+    {
+      name: "Anime-Sama",
+      regex: /^(.+?)\s*-\s*Saison\s+(\d+)\s*-\s*Anime-Sama/i,
+      extractGroups: {
+        animeName: 1,
+        season: 2,
+        episode: 0,
+        language: 0,
+        platform: 0
+      },
+      confidence: 90,
+      description: "Anime-Sama season format"
+    },
+
+    // ADKAMI PATTERNS  
+    // "Kimi to Idol Precure♪ - Episode 28 vostfr - ADKami.mp4"
+    {
+      name: "ADKami",
+      regex: /^(.+?)\s*-\s*Episode\s+(\d+)\s+(vostfr|vf)\s*-\s*ADKami/i,
+      extractGroups: {
+        animeName: 1,
+        season: 0,
+        episode: 2,
+        language: 3,
+        platform: 0
+      },
+      confidence: 90,
+      description: "ADKami episode format"
+    },
+
+    // FRANIME PATTERNS
+    // "Mushishi Special - Hihamukage S1 EP1 VOSTFR - FRAnime.fr #1 DE L'ANIME SANS PUB ET GRATUIT.mp4"
+    {
+      name: "FRAnime",
+      regex: /^(.+?)\s*-\s*.*?S(\d+)\s*EP(\d+)\s+(VOSTFR|VF)\s*-\s*FRAnime/i,
+      extractGroups: {
+        animeName: 1,
+        season: 2,
+        episode: 3,
+        language: 4,
+        platform: 0
+      },
+      confidence: 90,
+      description: "FRAnime S1 EP1 format"
+    },
+
+    // HIANIME PATTERNS
+    // "Watch Kamitsubaki City Under Construction English Sub-Dub online Free on HiAnime.to.ts"
+    {
+      name: "HiAnime",
+      regex: /^Watch\s+(.+?)\s+English\s+Sub-Dub\s+online\s+Free\s+on\s+HiAnime/i,
+      extractGroups: {
+        animeName: 1,
+        season: 0,
+        episode: 0,
+        language: 0,
+        platform: 0
+      },
+      confidence: 85,
+      description: "HiAnime streaming format"
+    },
+
+    // NYAA TORRENT PATTERNS
+    // "[shincaps] Black Clover - 129 (ANIMAX Asia 1920x1080 H264 MP2).ts"
+    {
+      name: "Nyaa Fansub",
+      regex: /^\[([^\]]+)\]\s*(.+?)\s*-\s*(\d+)\s*(?:\([^)]*\))?/i,
+      extractGroups: {
+        animeName: 2,
+        season: 0,
+        episode: 3,
+        language: 0,
+        platform: 1
+      },
+      confidence: 85,
+      description: "Nyaa fansub format with release group"
+    },
+
+    // "Black.Clover.S01.MULTi.1080p.BDRiP.x265-KAF"
+    {
+      name: "Nyaa Season Pack",
+      regex: /^([^.]+(?:\.[^.]+)?)\.(S\d+)\./i,
+      extractGroups: {
+        animeName: 1,
+        season: 2,
+        episode: 0,
+        language: 0,
+        platform: 0
+      },
+      confidence: 80,
+      description: "Nyaa season pack format"
+    },
+
+    // "[Tsundere-Raws] Black Clover - 169 VOSTFR [CR 720p].mkv"
+    {
+      name: "Nyaa CR VOSTFR",
+      regex: /^\[([^\]]+)\]\s*(.+?)\s*-\s*(\d+)\s*(VOSTFR|VF)\s*\[([^\]]+)\]/i,
+      extractGroups: {
+        animeName: 2,
+        season: 0,
+        episode: 3,
+        language: 4,
+        platform: 1
+      },
+      confidence: 90,
+      description: "Nyaa Crunchyroll VOSTFR format"
+    },
+
+    // SIMPLIFIED PATTERNS
+    // "NarutoE01.mp4", "One Punch ManE01.mp4"
+    {
+      name: "Simple Episode",
+      regex: /^(.+?)E(\d+)\.(mp4|mkv|avi|ts)$/i,
+      extractGroups: {
+        animeName: 1,
+        season: 0,
+        episode: 2,
+        language: 0,
+        platform: 0
+      },
+      confidence: 75,
+      description: "Simple AnimeE01 format"
+    },
+
+    // "Shingeki no Kyojin 3E17 [VF].mp4", "I Left My AE09.mp4"
+    {
+      name: "Season Episode",
+      regex: /^(.+?)\s*(\d+)E(\d+)(?:\s*\[([VF|VOSTFR]+)\])?\.(mp4|mkv|avi|ts)$/i,
+      extractGroups: {
+        animeName: 1,
+        season: 2,
+        episode: 3,
+        language: 4,
+        platform: 0
+      },
+      confidence: 80,
+      description: "Season number + episode format"
+    },
+
+    // "Shingeki no Kyojin The Final SeasonE01.mp4"
+    {
+      name: "Named Season Episode",
+      regex: /^(.+?)\s+((?:The\s+)?(?:Final\s+)?Season)E(\d+)\.(mp4|mkv|avi|ts)$/i,
+      extractGroups: {
+        animeName: 1,
+        season: 0, // Named season, will be handled separately
+        episode: 3,
+        language: 0,
+        platform: 0
+      },
+      confidence: 75,
+      description: "Named season format (Final Season, etc.)"
+    },
+
+    // LEGACY PATTERNS (keeping existing ones for compatibility)
+    // "SNK_S1_1_VF.mp4"
     {
       name: "Abbreviation Season",
       regex: /^([A-Z]+)_S(\d+)_(\d+)_([VF|VOSTFR]+)/i,
@@ -45,10 +203,10 @@ export class FileParser {
         platform: 0
       },
       confidence: 85,
-      description: "Format abrégé avec saison (SNK_S1_1_VF)"
+      description: "Abbreviated format with season (SNK_S1_1_VF)"
     },
 
-    // Simple pattern with dots: "NS.52.VF.www.vostfree.com.mp4"
+    // "NS.52.VF.www.vostfree.com.mp4"
     {
       name: "Abbreviation Dot",
       regex: /^([A-Z]+)\.(\d+)\.(VF|VOSTFR)\..*$/i,
@@ -60,12 +218,12 @@ export class FileParser {
         platform: 0
       },
       confidence: 80,
-      description: "Format abrégé avec points (NS.52.VF)"
+      description: "Abbreviated format with dots (NS.52.VF)"
     },
 
-    // Generic anime title with episode: "Hataraku Maou sama.ts"
+    // Generic fallback: "Hataraku Maou sama.ts"
     {
-      name: "Simple Title",
+      name: "Generic Title",
       regex: /^([^.]+?)(?:\s+(\d+))?\.(ts|mkv|mp4|avi)$/i,
       extractGroups: {
         animeName: 1,
@@ -74,46 +232,12 @@ export class FileParser {
         language: 0,
         platform: 0
       },
-      confidence: 60,
-      description: "Titre simple avec extension"
-    },
-
-    // I Left My A-Rank pattern: "I Left My A-Rank Party to Help My Former Students Reach the Dungeon Depths! - I Left My A Rank Party to Help My Former Students Reach the Dungeon Depths - 06 VOSTFR - 06 - Voiranime.mp4"
-    {
-      name: "Long Title Voiranime",
-      regex: /^(.{20,}?)\s*-\s*(.+?)\s*-\s*(\d+)\s*(VOSTFR|VF)\s*-\s*\3\s*-\s*Voiranime/i,
-      extractGroups: {
-        animeName: 1,
-        season: 0,
-        episode: 3,
-        language: 4,
-        platform: 0
-      },
-      confidence: 90,
-      description: "Titres longs format Voiranime"
+      confidence: 50,
+      description: "Generic title with optional episode"
     }
   ];
 
-  private static readonly EXCLUSION_PATTERNS = [
-    // Musique
-    /\b(music|beat|lofi|vlog|royalty\s+free|prod\s*\.\s*by)\b/i,
-    /^(lukrembo|massobeats|RYLLZ)/i,
-    /(type\s+beat|no\s+copyright)/i,
-    
-    // Tutoriels/Tech
-    /\b(tutorial|dribbble|bliss\s+os|dual\s+boot)\b/i,
-    
-    // Courts clips sociaux
-    /#(anime|edit|shorts|animeedit|animeshorts)/i,
-    /\b(edit|clip|moment|flirts|jealous)\b/i,
-    
-    // Suspicious file extensions
-    /\b(ui|reservation)\b/i,
-    
-    // Patterns de noms étranges
-    /^[?]{4}\s/i, // Commence par "???? "
-    /M[?]+\s+U[?]+/i // Pattern type "M????????????? U????????????????"
-  ];
+  // REMOVED: No more exclusion patterns - let API decide what is anime or not
 
   private static readonly VIDEO_EXTENSIONS = [
     '.mp4', '.mkv', '.avi', '.mov', '.wmv', '.flv', '.webm', '.ts', '.m4v'
@@ -133,46 +257,28 @@ export class FileParser {
       };
     }
 
-    // Check exclusion patterns
-    for (const pattern of this.EXCLUSION_PATTERNS) {
-      if (pattern.test(fileName)) {
-        const type = this.determineExclusionType(fileName);
-        return {
-          file: fileName,
-          type,
-          confidence: 90,
-          reason: `Exclusion pattern detected: ${pattern.source}`
-        };
-      }
-    }
-
-    // Check anime patterns
+    // Try to parse as potential anime - if any pattern matches, classify as potential anime
     for (const animePattern of this.ANIME_PATTERNS) {
       if (animePattern.regex.test(fileName)) {
         return {
           file: fileName,
-          type: 'anime',
+          type: 'anime', // Potential anime - API will validate
           confidence: animePattern.confidence,
-          reason: `Anime pattern detected: ${animePattern.name}`
+          reason: `Potential anime pattern: ${animePattern.name}`
         };
       }
     }
 
-    // If no pattern matches
+    // If no anime pattern matches, still treat as potential anime
+    // API will determine if it's actually an anime or not
     return {
       file: fileName,
-      type: 'unknown',
+      type: 'anime', // Let API decide - could be anime with unknown pattern
       confidence: 30,
-      reason: 'No pattern recognized'
+      reason: 'Unknown pattern - will validate via API'
     };
   }
 
-  private static determineExclusionType(fileName: string): 'music' | 'tutorial' | 'clip' | 'other' {
-    if (/\b(music|beat|lofi|prod)\b/i.test(fileName)) return 'music';
-    if (/\b(tutorial|dribbble|dual\s+boot)\b/i.test(fileName)) return 'tutorial';
-    if (/#(anime|edit|shorts)|edit|clip|moment/i.test(fileName)) return 'clip';
-    return 'other';
-  }
 
   static parseAnimeFile(filePath: string): ParsedAnimeFile | null {
     const fileName = path.basename(filePath);

@@ -144,19 +144,24 @@ export class DirectoryManager {
     const parsed = match.parsedFile;
     const ext = path.extname(parsed.fileName);
     
-    // Format: "Anime Name - S01E05 [VF].mp4"
+    // Format: "Anime Name - S01E05 [VF].mp4" (exact spacing as requested)
     let cleanName = match.normalizedName.replace(/[:<>"|?*]/g, '');
     
-    if (parsed.season) {
-      cleanName += ` - S${parsed.season.toString().padStart(2, '0')}`;
-    }
+    // Always add season (default to S01 if not specified)
+    const seasonNum = parsed.season || 1;
+    cleanName += ` - S${seasonNum.toString().padStart(2, '0')}`;
     
+    // Always add episode with proper padding
     if (parsed.episode) {
       cleanName += `E${parsed.episode.toString().padStart(2, '0')}`;
+    } else {
+      cleanName += `E01`; // Default episode if not found
     }
     
+    // Add language if available, default to empty if not specified
     if (parsed.language) {
-      cleanName += ` [${parsed.language}]`;
+      const normalizedLang = parsed.language.toUpperCase();
+      cleanName += ` [${normalizedLang}]`;
     }
     
     return cleanName + ext;

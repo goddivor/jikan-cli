@@ -70,28 +70,83 @@ export class OrganizeCommands {
       console.log(chalk.blue('🌐 Validating with Jikan API...'));
       console.log(chalk.gray('   (This may take a few minutes depending on the number of files)'));
       
-      const matches = await AnimeValidator.validateBatch(parsedFiles);
-      console.log(chalk.green(`✅ Validation completed for ${matches.length} files`));
+      let { animeMatches, otherFiles } = await AnimeValidator.validateBatch(parsedFiles);
+      
+      console.log(chalk.green(`✅ API validation completed`));
+      console.log(chalk.green(`   📺 Anime files confirmed: ${animeMatches.length}`));
+      if (otherFiles.length > 0) {
+        console.log(chalk.yellow(`   📄 Other files (not anime): ${otherFiles.length}`));
+      }
       console.log();
 
-      // Interactive mode for review
+      if (animeMatches.length === 0) {
+        console.log(chalk.yellow('⚠️  No anime files confirmed by API.'));
+        if (otherFiles.length > 0) {
+          console.log(chalk.gray(`   ${otherFiles.length} files were not recognized as anime:`));
+          otherFiles.slice(0, 5).forEach(file => {
+            console.log(chalk.gray(`   - ${file.fileName}`));
+          });
+          if (otherFiles.length > 5) {
+            console.log(chalk.gray(`   ... and ${otherFiles.length - 5} more`));
+          }
+        }
+        process.exit(0);
+      }
+
+      // Interactive mode for review and recovery
       if (options.interactive) {
-        const shouldContinue = await this.showInteractiveReview(matches, options);
+        let finalMatches = animeMatches;
+        let remainingOtherFiles = otherFiles;
+
+        // Show main review first
+        const shouldContinue = await this.showInteractiveReview(finalMatches, options);
         if (!shouldContinue) {
           console.log(chalk.cyan('👋 Operation cancelled by user.'));
           process.exit(0);
         }
+
+        // Offer recovery of skipped files if any exist
+        if (remainingOtherFiles.length > 0) {
+          const recoveredFiles = await InteractiveUtils.selectSkippedFilesToRecover(remainingOtherFiles);
+          
+          if (recoveredFiles.length > 0) {
+            console.log(chalk.blue(`\n🔄 Attempting to recover ${recoveredFiles.length} selected file(s)...`));
+            
+            const { newMatches, stillSkipped } = await AnimeValidator.recoverAndGroupSkippedFiles(
+              recoveredFiles, 
+              finalMatches
+            );
+            
+            if (newMatches.length > 0) {
+              finalMatches = [...finalMatches, ...newMatches];
+              console.log(chalk.green(`✅ Successfully recovered ${newMatches.length} file(s) as anime!`));
+              
+              // Update remaining other files
+              remainingOtherFiles = remainingOtherFiles.filter(f => 
+                !recoveredFiles.includes(f) || stillSkipped.includes(f)
+              );
+              remainingOtherFiles.push(...stillSkipped);
+            }
+            
+            if (stillSkipped.length > 0) {
+              console.log(chalk.yellow(`⚠️  ${stillSkipped.length} file(s) still not confirmed as anime`));
+            }
+          }
+        }
+
+        // Update the matches for final organization
+        animeMatches = finalMatches;
       }
 
       // Display preview
       if (options.preview) {
-        this.displayPreview(matches, options);
+        this.displayPreview(animeMatches, options);
         process.exit(0);
       }
 
       // Final confirmation before organization
       if (!options.interactive) {
-        const preview = DirectoryManager.generatePreviewReport(matches, options);
+        const preview = DirectoryManager.generatePreviewReport(animeMatches, options);
         console.log(preview);
         
         // Ask for confirmation (unless --force is specified)
@@ -107,7 +162,7 @@ export class OrganizeCommands {
 
       // File organization
       console.log(chalk.blue('📁 Organizing files in progress...'));
-      const result = await DirectoryManager.organizeFiles(matches, options);
+      const result = await DirectoryManager.organizeFiles(animeMatches, options);
       
       this.displayOrganizeResult(result, options);
 
@@ -123,15 +178,11 @@ export class OrganizeCommands {
       return acc;
     }, {} as Record<string, number>);
 
-    console.log(chalk.gray('   File classification:'));
+    console.log(chalk.gray('   Initial classification (will be validated by API):'));
     
     const typeIcons: Record<string, string> = {
       anime: '📺',
-      music: '🎵',
-      tutorial: '🎓',
-      clip: '🎬',
-      other: '📄',
-      unknown: '❓'
+      other: '📄'
     };
 
     for (const [type, count] of Object.entries(summary)) {
@@ -144,7 +195,7 @@ export class OrganizeCommands {
 
   private static displaySuggestionsForUnknownFiles(classifications: FileClassification[]): void {
     const unknownFiles = classifications
-      .filter(c => c.type === 'unknown' || c.type === 'other')
+      .filter(c => c.type === 'other')
       .slice(0, 5); // Montrer seulement les 5 premiers
 
     if (unknownFiles.length > 0) {
@@ -155,8 +206,8 @@ export class OrganizeCommands {
         console.log(chalk.gray(`   • ${file.file} (${file.reason})`));
       }
       
-      if (classifications.filter(c => c.type === 'unknown' || c.type === 'other').length > 5) {
-        const remaining = classifications.filter(c => c.type === 'unknown' || c.type === 'other').length - 5;
+      if (classifications.filter(c => c.type === 'other').length > 5) {
+        const remaining = classifications.filter(c => c.type === 'other').length - 5;
         console.log(chalk.gray(`   ... and ${remaining} other file(s)`));
       }
 
