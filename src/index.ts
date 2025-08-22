@@ -3,8 +3,10 @@
 import { ArgsParser } from "./utils/args-parser";
 import { AnimeCommands } from "./commands/anime-commands";
 import { MangaCommands } from "./commands/manga-commands";
+import { OrganizeCommands } from "./commands/organize-commands";
 import { DisplayUtils } from "./utils/display";
 import { AdvancedSearchOptions } from "./types/anime";
+import { OrganizeOptions } from "./types/organize";
 
 const args = process.argv.slice(2);
 const parsedArgs = ArgsParser.parse(args);
@@ -13,6 +15,28 @@ async function main(): Promise<void> {
   // Handle help command
   if (args.includes('--help') || args.includes('-h')) {
     ArgsParser.showHelp();
+    return;
+  }
+
+  // Handle organize help command
+  if (parsedArgs.showOrganizeHelp) {
+    await OrganizeCommands.showOrganizeHelp();
+    return;
+  }
+
+  // Handle organize command
+  if (parsedArgs.organize) {
+    const organizeOptions: OrganizeOptions = {
+      sourceDirectory: parsedArgs.organize,
+      targetDirectory: parsedArgs.organizeTarget,
+      preview: parsedArgs.organizePreview,
+      interactive: parsedArgs.interactive,
+      minConfidence: parsedArgs.organizeMinConfidence,
+      handleDuplicates: parsedArgs.organizeHandleDuplicates,
+      createSeasonFolders: true,
+    };
+    
+    await OrganizeCommands.organizeAnimeFiles(organizeOptions);
     return;
   }
 

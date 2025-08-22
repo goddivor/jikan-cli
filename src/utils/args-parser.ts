@@ -27,6 +27,13 @@ export interface ParsedArgs {
   fuzzyThreshold?: number;
   genreSearch?: boolean;
   showGenres?: boolean;
+  // Organization options
+  organize?: string;
+  organizePreview?: boolean;
+  organizeTarget?: string;
+  organizeMinConfidence?: number;
+  organizeHandleDuplicates?: 'skip' | 'rename' | 'overwrite';
+  showOrganizeHelp?: boolean;
 }
 
 export class ArgsParser {
@@ -64,11 +71,19 @@ export class ArgsParser {
     const genreSearchIndex = args.findIndex((arg) => arg === "--genre-search" || arg === "-gs");
     const mediaTypeIndex = args.findIndex((arg) => arg === "--media" || arg === "-m");
 
+    // Organization options
+    const organizeIndex = args.findIndex((arg) => arg === "--organize");
+    const organizeTargetIndex = args.findIndex((arg) => arg === "--target");
+    const organizeMinConfidenceIndex = args.findIndex((arg) => arg === "--min-confidence");
+    const organizeHandleDuplicatesIndex = args.findIndex((arg) => arg === "--handle-duplicates");
+
     // Flags
     const detailsFlag = args.includes("-d") || args.includes("--details");
     const interactive = args.includes("--interactive");
     const fuzzySearch = args.includes("--fuzzy") || args.includes("-f");
     const showGenres = args.includes("--list-genres") || args.includes("--genres-list");
+    const organizePreview = args.includes("--preview");
+    const showOrganizeHelp = args.includes("--organize-help");
 
     // Basic parsing
     const query = searchIndex !== -1 ? args[searchIndex + 1] : undefined;
@@ -135,6 +150,16 @@ export class ArgsParser {
       ? parseFloat(args[fuzzyThresholdIndex + 1])
       : 0.4;
 
+    // Organization parsing
+    const organize = organizeIndex !== -1 ? args[organizeIndex + 1] : undefined;
+    const organizeTarget = organizeTargetIndex !== -1 ? args[organizeTargetIndex + 1] : undefined;
+    const organizeMinConfidence = organizeMinConfidenceIndex !== -1 && args[organizeMinConfidenceIndex + 1]
+      ? parseInt(args[organizeMinConfidenceIndex + 1])
+      : 70;
+    const organizeHandleDuplicates = organizeHandleDuplicatesIndex !== -1 && args[organizeHandleDuplicatesIndex + 1]
+      ? args[organizeHandleDuplicatesIndex + 1] as 'skip' | 'rename' | 'overwrite'
+      : 'skip';
+
     return {
       query,
       limit,
@@ -163,6 +188,12 @@ export class ArgsParser {
       fuzzyThreshold,
       genreSearch,
       showGenres,
+      organize,
+      organizePreview,
+      organizeTarget,
+      organizeMinConfidence,
+      organizeHandleDuplicates,
+      showOrganizeHelp,
     };
   }
 
@@ -210,6 +241,14 @@ ADVANCED SEARCH:
   -f, --fuzzy                   Enable fuzzy search (typo tolerance)
   --fuzzy-threshold <number>    Fuzzy search threshold (0.0-1.0, default: 0.4)
 
+ORGANIZATION:
+  --organize <directory>        Organize anime files in specified directory
+  --preview                     Show preview without moving files
+  --target <directory>          Target directory for organized files
+  --min-confidence <0-100>      Minimum confidence threshold (default: 70)
+  --handle-duplicates <mode>    skip|rename|overwrite (default: skip)
+  --organize-help               Show detailed organization help
+
 EXAMPLES:
   Basic anime search:
     jikan-cli -s "naruto"
@@ -227,6 +266,11 @@ EXAMPLES:
   Interactive mode:
     jikan-cli -s "naruto" --interactive
     jikan-cli --media manga --genre-search "action" --interactive
+
+  File organization:
+    jikan-cli --organize "./Downloads" --preview
+    jikan-cli --organize "./Downloads" --interactive
+    jikan-cli --organize "./Downloads" --target "./Anime Library"
 `;
     console.log(helpText);
   }

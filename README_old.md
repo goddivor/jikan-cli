@@ -6,16 +6,6 @@
 
 ## 🚀 Features
 
-### 🗂️ **NEW: Auto-Organization**
-- **Intelligent anime file organization** from messy download folders
-- **Pattern recognition** for multiple streaming platform formats  
-- **API validation** via Jikan (MyAnimeList) for accurate anime names
-- **Smart filtering** excludes non-anime files (music, tutorials, clips)
-- **Preview mode** to review changes before organizing
-- **Interactive mode** with confidence scoring and manual review
-- **Duplicate handling** with skip, rename, or overwrite options
-- **Custom target directories** and confidence thresholds
-
 ### Media Type Support
 - **Anime & Manga** support with `--media` flag (anime by default)
 - Seamless switching between anime and manga search
@@ -53,17 +43,6 @@
   - **Manga**: Score, Members, Start Date, Title, Rank, Popularity, Chapters, Volumes
   - Ascending or Descending order
 
-### 🗂️ File Organization
-- **Auto-organize anime collections** from download folders
-- **Multi-platform format support**:
-  - Voiranime: `"Anime (VF) - Anime - 01 VF - 01 - Voiranime.mp4"`
-  - Abbreviated: `"SNK_S1_1_VF.mp4"`
-  - Simple: `"Naruto.mp4"`
-- **Smart file classification** with confidence scoring
-- **Season-based folder structure** creation
-- **Conflict resolution** for duplicate files
-- **Preview mode** for safe testing
-
 ### 📊 Display & Output
 - **Rich Display**:
   - Title and year
@@ -100,112 +79,6 @@ npm run build
 ```bash
 npm install -g .
 ```
-
----
-
-## 🗂️ **Auto-Organization Feature**
-
-### Quick Start
-
-```bash
-# Preview what would be organized (recommended first step)
-jikan-cli --organize "./Downloads" --preview
-
-# Interactive organization with manual review
-jikan-cli --organize "./Downloads" --interactive
-
-# Direct organization to specific folder
-jikan-cli --organize "./Downloads" --target "./Anime Library"
-```
-
-### How It Works
-
-1. **🔍 File Scanning**: Detects video files in your specified directory
-2. **🎯 Smart Classification**: Separates anime from non-anime files (music, tutorials, etc.)
-3. **📝 Pattern Recognition**: Parses anime names, seasons, and episodes from various formats
-4. **🌐 API Validation**: Validates and normalizes anime names using Jikan API
-5. **📁 Structure Creation**: Generates organized folder structure
-6. **📦 File Organization**: Moves files to appropriate locations
-
-### Supported File Patterns
-
-**Voiranime Format:**
-```
-Naruto- Shippuuden (VF) - Naruto Shippuden - 052 VF - 052 - Voiranime.mp4
-→ Naruto Shippuden/Season 1/Naruto Shippuden - S01E52 [VF].mp4
-```
-
-**Abbreviated Format:**
-```
-SNK_S3_17_VF.mp4
-→ Attack on Titan/Season 3/Attack on Titan - S03E17 [VF].mp4
-```
-
-**Simple Format:**
-```
-Naruto.mp4
-→ Naruto/Naruto.mp4
-```
-
-### Generated Structure
-
-```
-Anime Library/
-├── Naruto/
-│   ├── Season 1/
-│   │   ├── Naruto - S01E01 [VF].mp4
-│   │   ├── Naruto - S01E02 [VF].mp4
-│   │   └── ...
-│   └── Season 2/
-├── Attack on Titan/
-│   ├── Season 1/
-│   ├── Season 2/
-│   └── Season 3/
-│       ├── Attack on Titan - S03E12 [VF].mp4
-│       └── Attack on Titan - S03E17 [VF].mp4
-└── One Piece/
-    └── Season 1/
-        └── One Piece - S01E1000 [VOSTFR].mp4
-```
-
-### Organization Options
-
-```bash
-# Show detailed help for organization
-jikan-cli --organize-help
-
-# Preview mode (no files moved)
-jikan-cli --organize "./Downloads" --preview
-
-# Interactive mode with manual review
-jikan-cli --organize "./Downloads" --interactive
-
-# Custom target directory
-jikan-cli --organize "./Downloads" --target "./My Anime Collection"
-
-# Adjust confidence threshold (default: 70)
-jikan-cli --organize "./Downloads" --min-confidence 60
-
-# Handle duplicates: skip, rename, or overwrite
-jikan-cli --organize "./Downloads" --handle-duplicates rename
-```
-
-### What Gets Filtered Out
-
-The tool automatically ignores non-anime files:
-- **Music**: `lukrembo - butter (royalty free vlog music).mp4`
-- **Tutorials**: `Dual Boot Bliss OS and Windows Without USB Drive.mp4`
-- **Short clips**: Files with `#anime #edit #shorts` patterns
-- **Other content**: Unrecognized or very low confidence files
-
-### Safety Features
-
-- **Preview Mode**: See exactly what will happen before any files are moved
-- **Confidence Scoring**: Each detection gets a confidence score (0-100%)
-- **Interactive Review**: Manually verify questionable matches
-- **Duplicate Handling**: Choose how to handle existing files
-- **API Validation**: Cross-reference with MyAnimeList database
-- **Fallback Names**: Graceful handling when API lookup fails
 
 ---
 
@@ -387,30 +260,12 @@ jikan-cli -i 1735                 # Anime details by ID
 jikan-cli -mi 13                  # Manga details by ID (One Piece)
 ```
 
-### 🗂️ File Organization Examples
-
-```bash
-# Organization examples
-jikan-cli --organize "./Downloads" --preview
-jikan-cli --organize "./Downloads" --interactive
-jikan-cli --organize "./Downloads" --min-confidence 60
-jikan-cli --organize "./Downloads" --target "./Anime Library"
-```
-
 ---
 
 ## 📋 Command Reference
 
 ### Media Type Selection
 - `-m`, `--media <type>` : Specify media type (anime or manga, default: anime)
-
-### Organization Commands
-- `--organize <directory>` : Organize anime files in specified directory
-- `--organize-help` : Show detailed organization help and examples
-- `--preview` : Show preview without moving files (use with --organize)
-- `--target <directory>` : Custom target directory for organized files
-- `--min-confidence <0-100>` : Minimum confidence threshold (default: 70)
-- `--handle-duplicates <mode>` : How to handle duplicates: skip, rename, overwrite
 
 ### Main Commands
 - `-s`, `--search <query>` : Search by name
@@ -518,21 +373,16 @@ jikan-cli/
 ├── src/
 │   ├── commands/          # Command implementations
 │   │   ├── anime-commands.ts    # Anime-specific commands
-│   │   ├── manga-commands.ts    # Manga-specific commands
-│   │   └── organize-commands.ts # File organization commands
+│   │   └── manga-commands.ts    # Manga-specific commands
 │   ├── services/          # API service layer
-│   │   ├── jikan-api.ts         # Jikan API client (anime & manga)
-│   │   └── anime-validator.ts   # Anime name validation & enrichment
+│   │   └── jikan-api.ts         # Jikan API client (anime & manga)
 │   ├── types/             # TypeScript type definitions
-│   │   ├── anime.ts             # Type definitions for anime & manga
-│   │   └── organize.ts          # Type definitions for file organization
+│   │   └── anime.ts             # Type definitions for anime & manga
 │   ├── utils/             # Utility functions
 │   │   ├── args-parser.ts       # Command line argument parsing
 │   │   ├── display.ts           # Display utilities for anime & manga
 │   │   ├── interactive.ts       # Interactive mode utilities
-│   │   ├── advanced-search.ts   # Advanced search & filtering
-│   │   ├── file-parser.ts       # Anime file name parsing & classification
-│   │   └── directory-manager.ts # File system operations & organization
+│   │   └── advanced-search.ts   # Advanced search & filtering
 │   └── index.ts           # Main CLI entry point
 ├── dist/                  # Compiled JavaScript files
 ├── package.json           # Dependencies & CLI metadata
