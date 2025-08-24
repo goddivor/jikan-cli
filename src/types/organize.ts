@@ -31,6 +31,7 @@ export interface OrganizeOptions {
   preview?: boolean;
   interactive?: boolean;
   minConfidence?: number; // Seuil minimum de confiance (défaut: 70)
+  adjustConfidence?: boolean; // Force confidence adjustment interface
   createSeasonFolders?: boolean;
   handleDuplicates?: 'skip' | 'rename' | 'overwrite';
   videoExtensions?: string[];

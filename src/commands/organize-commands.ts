@@ -244,18 +244,61 @@ export class OrganizeCommands {
     if (lowConfidenceMatches.length > 0) {
       console.log(chalk.yellow(`⚠️  ${lowConfidenceMatches.length} matches with low confidence (<${minConfidence}%)`));
       
-      const showLow = await InteractiveUtils.confirmAction('View questionable matches?');
+      const showLow = options.adjustConfidence || await InteractiveUtils.confirmAction('View questionable matches?');
       if (showLow) {
         this.displayMatchDetails(lowConfidenceMatches);
         
-        const adjustConfidence = await InteractiveUtils.confirmAction(
-          'Would you like to adjust the minimum confidence threshold?'
+        const adjustConfidence = options.adjustConfidence || await InteractiveUtils.confirmAction(
+          'Would you like to adjust confidence settings?'
         );
         
         if (adjustConfidence) {
-          // This feature could be implemented later
-          console.log(chalk.gray('   Adjustment feature to be implemented...'));
+          const adjustmentResult = await InteractiveUtils.adjustConfidenceInteractive(matches);
+          
+          // Update options with new threshold
+          if (adjustmentResult.newThreshold !== options.minConfidence) {
+            console.log(chalk.green(`✅ Updated minimum confidence threshold to ${adjustmentResult.newThreshold}%`));
+            options.minConfidence = adjustmentResult.newThreshold;
+          }
+          
+          // Use adjusted matches
+          matches.splice(0, matches.length, ...adjustmentResult.adjustedMatches);
+          
+          // Recalculate good/low confidence matches with new settings
+          const newMinConfidence = options.minConfidence || 70;
+          const newLowConfidenceMatches = matches.filter(m => m.parsedFile.confidence < newMinConfidence);
+          const newGoodMatches = matches.filter(m => m.parsedFile.confidence >= newMinConfidence);
+          
+          console.log(chalk.blue(`\n📊 Updated Statistics (threshold: ${newMinConfidence}%):`));
+          console.log(chalk.green(`   ✅ High confidence: ${newGoodMatches.length} files`));
+          console.log(chalk.yellow(`   ⚠️  Low confidence: ${newLowConfidenceMatches.length} files\n`));
         }
+      }
+    } else if (options.adjustConfidence && goodMatches.length > 0) {
+      // Even if all matches have good confidence, still offer adjustment if flag is set
+      console.log(chalk.green(`✅ All ${goodMatches.length} matches have good confidence (≥${minConfidence}%)`));
+      
+      const stillAdjust = await InteractiveUtils.confirmAction('Still want to review confidence settings?');
+      if (stillAdjust) {
+        const adjustmentResult = await InteractiveUtils.adjustConfidenceInteractive(matches);
+        
+        // Update options with new threshold
+        if (adjustmentResult.newThreshold !== options.minConfidence) {
+          console.log(chalk.green(`✅ Updated minimum confidence threshold to ${adjustmentResult.newThreshold}%`));
+          options.minConfidence = adjustmentResult.newThreshold;
+        }
+        
+        // Use adjusted matches
+        matches.splice(0, matches.length, ...adjustmentResult.adjustedMatches);
+        
+        // Recalculate statistics
+        const newMinConfidence = options.minConfidence || 70;
+        const newLowConfidenceMatches = matches.filter(m => m.parsedFile.confidence < newMinConfidence);
+        const newGoodMatches = matches.filter(m => m.parsedFile.confidence >= newMinConfidence);
+        
+        console.log(chalk.blue(`\n📊 Final Statistics (threshold: ${newMinConfidence}%):`));
+        console.log(chalk.green(`   ✅ High confidence: ${newGoodMatches.length} files`));
+        console.log(chalk.yellow(`   ⚠️  Low confidence: ${newLowConfidenceMatches.length} files\n`));
       }
     }
 
@@ -381,6 +424,7 @@ ${chalk.yellow('OPTIONS:')}
   --interactive               Interactive mode with match review
   --target <directory>        Target directory (default: <source>/Organized)
   --min-confidence <0-100>    Minimum confidence threshold (default: 70)
+  --adjust-confidence         Interactive confidence adjustment tool
   --handle-duplicates <mode>  skip|rename|overwrite (default: skip)
 
 ${chalk.yellow('EXAMPLES:')}
@@ -395,6 +439,9 @@ ${chalk.yellow('EXAMPLES:')}
 
   ${chalk.green('# Organization to specific directory')}
   jikan-cli --organize "./Downloads" --target "./Anime Library"
+
+  ${chalk.green('# Interactive confidence adjustment')}
+  jikan-cli --organize "./Downloads" --adjust-confidence
 
 ${chalk.yellow('SUPPORTED FILE FORMATS:')}
   ${chalk.gray('Extensions:')} .mp4, .mkv, .avi, .mov, .wmv, .flv, .webm, .ts, .m4v

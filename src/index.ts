@@ -30,8 +30,9 @@ async function main(): Promise<void> {
       sourceDirectory: parsedArgs.organize,
       targetDirectory: parsedArgs.organizeTarget,
       preview: parsedArgs.organizePreview,
-      interactive: parsedArgs.interactive,
+      interactive: parsedArgs.interactive || parsedArgs.organizeAdjustConfidence, // Auto-enable interactive if confidence adjustment is requested
       minConfidence: parsedArgs.organizeMinConfidence,
+      adjustConfidence: parsedArgs.organizeAdjustConfidence,
       handleDuplicates: parsedArgs.organizeHandleDuplicates,
       createSeasonFolders: true,
     };

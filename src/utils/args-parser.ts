@@ -33,6 +33,7 @@ export interface ParsedArgs {
   organizeTarget?: string;
   organizeMinConfidence?: number;
   organizeHandleDuplicates?: 'skip' | 'rename' | 'overwrite';
+  organizeAdjustConfidence?: boolean;
   showOrganizeHelp?: boolean;
 }
 
@@ -83,6 +84,7 @@ export class ArgsParser {
     const fuzzySearch = args.includes("--fuzzy") || args.includes("-f");
     const showGenres = args.includes("--list-genres") || args.includes("--genres-list");
     const organizePreview = args.includes("--preview");
+    const organizeAdjustConfidence = args.includes("--adjust-confidence") || args.includes("--confidence-adjust");
     const showOrganizeHelp = args.includes("--organize-help");
 
     // Basic parsing
@@ -193,6 +195,7 @@ export class ArgsParser {
       organizeTarget,
       organizeMinConfidence,
       organizeHandleDuplicates,
+      organizeAdjustConfidence,
       showOrganizeHelp,
     };
   }
@@ -246,6 +249,7 @@ ORGANIZATION:
   --preview                     Show preview without moving files
   --target <directory>          Target directory for organized files
   --min-confidence <0-100>      Minimum confidence threshold (default: 70)
+  --adjust-confidence           Interactive confidence adjustment tool
   --handle-duplicates <mode>    skip|rename|overwrite (default: skip)
   --organize-help               Show detailed organization help
 
